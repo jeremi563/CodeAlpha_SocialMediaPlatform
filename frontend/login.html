@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1f624d" />
+  <title>Log in · Social</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/auth.css" />
+  <link rel="stylesheet" href="/static/css/responsive.css" />
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+  <div class="auth-wrap">
+    <aside class="auth-art" aria-label="Social community">
+      <a href="/" class="brand"><span class="brand-mark"><svg class="icon"><use href="/static/assets/icons.svg#i-sparkles"></use></svg></span><span>Social</span></a>
+      <div class="auth-art-copy"><span class="eyebrow">A place to belong</span><h2>Good things happen when we share.</h2><p>Find your people, follow new ideas, and keep the conversation going.</p></div>
+      <div class="auth-art-foot">A thoughtful little corner of the internet.</div>
+    </aside>
+    <main class="auth-panel">
+      <section class="auth-card">
+        <a href="/" class="auth-back"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-arrow-left"></use></svg>Back to Social</a>
+        <span class="eyebrow">Welcome back</span>
+        <h1>Pick up where you left off.</h1>
+        <p class="subtitle">Sign in to your account to see what's new.</p>
+        <div class="auth-notice" id="auth-notice" role="status" hidden>Account created successfully. You can sign in now.</div>
+        <div class="auth-error" id="auth-error" role="alert" aria-live="polite"></div>
+        <form id="login-form" class="auth-form" novalidate>
+          <div class="auth-field"><label for="identifier">Username or email</label><input type="text" id="identifier" name="identifier" required autocomplete="username" placeholder="you@example.com" /></div>
+          <div class="auth-field"><label for="password">Password</label><input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter your password" /></div>
+          <button type="submit" class="btn btn-primary btn-wide" id="submit-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-lock"></use></svg><span>Sign in</span></button>
+        </form>
+        <p class="auth-switch">New to Social? <a href="/register">Create an account</a></p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { api, ApiError } from "/static/js/api.js";
+
+    const form = document.getElementById("login-form");
+    const errorBox = document.getElementById("auth-error");
+    const submitBtn = document.getElementById("submit-btn");
+    if (new URLSearchParams(window.location.search).get("registered") === "1") {
+      document.getElementById("auth-notice").hidden = false;
+    }
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.classList.add("visible");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.classList.remove("visible");
+
+        const identifier = form.elements.identifier.value.trim();
+        const password = form.elements.password.value;
+
+      if (!identifier || !password) {
+        return showError("Both fields are required.");
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.querySelector("span").textContent = "Signing in...";
+
+      try {
+        await api.post("/api/auth/login", { identifier, password });
+        window.location.href = "/";
+      } catch (err) {
+        // Section 11.3: generic errors only (backend already generic; we pass through)
+        showError(err.message || "Login failed.");
+        submitBtn.disabled = false;
+        submitBtn.querySelector("span").textContent = "Sign in";
+      }
+    });
+  </script>
+</body>
+</html>

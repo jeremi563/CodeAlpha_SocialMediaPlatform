@@ -1,0 +1,47 @@
+/* Responsive rules (Section 3.1 FR-12, Section 6.8) */
+
+/* Tablet: hide the right sidebar */
+@media (max-width: 1000px) {
+  .app-layout {
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  }
+  .sidebar-right { display: none; }
+}
+
+/* Mobile: single-column feed with collapsed nav (Section 6.8) */
+@media (max-width: 700px) {
+  .app-layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .sidebar-left {
+    position: static;
+    display: flex;
+    overflow-x: auto;
+    padding: 8px;
+  }
+  .sidebar-left .logo { padding: 8px 12px; }
+  .sidebar-left nav {
+    display: flex;
+    gap: 4px;
+  }
+  .sidebar-left nav a {
+    padding: 8px 12px;
+    white-space: nowrap;
+    margin-bottom: 0;
+  }
+
+  .card, .post { padding: 12px; border-radius: 6px; }
+
+  .auth-card { padding: 24px 20px; }
+
+  .profile-stats { gap: 16px; font-size: 13px; }
+}
+
+/* Very small screens */
+@media (max-width: 400px) {
+  html, body { font-size: 14px; }
+  .post-actions button { padding: 6px; font-size: 13px; }
+}

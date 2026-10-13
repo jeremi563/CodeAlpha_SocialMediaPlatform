@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#edf3ef" />
+  <title>Home · Social</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/responsive.css" />
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar-left">
+      <a href="/" class="brand" aria-label="Social home">
+        <span class="brand-mark"><svg class="icon"><use href="/static/assets/icons.svg#i-sparkles"></use></svg></span>
+        <span>Social</span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="/" class="active"><svg class="icon"><use href="/static/assets/icons.svg#i-home"></use></svg><span>Home</span></a>
+        <a href="/explore"><svg class="icon"><use href="/static/assets/icons.svg#i-compass"></use></svg><span>Explore</span></a>
+        <a href="/profile" id="my-profile-link"><svg class="icon"><use href="/static/assets/icons.svg#i-user"></use></svg><span>My profile</span></a>
+        <div class="nav-divider"></div>
+        <p class="nav-caption">Your space</p>
+        <a href="#" id="logout-link"><svg class="icon"><use href="/static/assets/icons.svg#i-log-out"></use></svg><span>Log out</span></a>
+      </nav>
+      <div class="sidebar-user" id="sidebar-account" hidden></div>
+    </aside>
+
+    <main class="feed-column">
+      <header class="page-heading">
+        <div><span class="eyebrow">The community</span><h1>Your feed</h1><p>A little of what everyone is sharing.</p></div>
+        <a class="icon-btn" href="/explore" aria-label="Discover people" title="Discover people"><svg class="icon"><use href="/static/assets/icons.svg#i-search"></use></svg></a>
+      </header>
+
+      <section class="composer" aria-label="Create a post">
+        <div class="composer-top">
+          <div class="avatar avatar-small" id="composer-avatar" aria-hidden="true">S</div>
+          <textarea id="composer-input" placeholder="What would you like to share?" maxlength="2000" aria-label="Post content"></textarea>
+        </div>
+        <div class="composer-divider"></div>
+        <div class="composer-footer">
+          <div class="composer-tools"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-sparkles"></use></svg><span>Share something thoughtful</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><span class="composer-count" id="composer-count">0 / 2000</span><button class="btn btn-primary" id="composer-submit" disabled><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-send"></use></svg><span>Publish</span></button></div>
+        </div>
+      </section>
+
+      <div class="section-heading"><h2>Latest posts</h2><span class="composer-count">Most recent first</span></div>
+      <section id="feed" aria-live="polite"><div class="loading">Loading your feed...</div></section>
+      <div style="text-align:center;margin:20px 0"><button id="load-more" class="btn btn-secondary" style="display:none"><span>Load more</span><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-arrow-up-right"></use></svg></button></div>
+    </main>
+
+    <aside class="sidebar-right" aria-label="Discover">
+      <section class="side-panel">
+        <h2>People to know</h2>
+        <div id="discover"><div class="loading">Finding people...</div></div>
+        <a class="side-note" href="/explore">Explore the community <span aria-hidden="true">→</span></a>
+      </section>
+      <section class="side-panel">
+        <h2>Make yourself at home</h2>
+        <p class="side-note" style="margin:0">Good conversations start with a hello. Find people who share your interests.</p>
+      </section>
+      <footer class="sidebar-footer">Social · Made for sharing ideas</footer>
+    </aside>
+  </div>
+
+  <script type="module">
+    import { initFeed } from "/static/js/feed.js";
+    import { initComments } from "/static/js/comments.js";
+    import { initLikes } from "/static/js/likes.js";
+    import { initFollows } from "/static/js/follows.js";
+    import { initAuth } from "/static/js/auth.js";
+
+    const session = await initAuth();
+    if (!session) throw new Error("Authentication required");
+    document.getElementById("my-profile-link").href = `/profile?username=${encodeURIComponent(session.user.username)}`;
+    const account = document.getElementById("sidebar-account");
+    account.hidden = false;
+    const avatar = document.createElement("div");
+    avatar.className = "avatar avatar-small";
+    avatar.textContent = session.user.fullName.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+    const meta = document.createElement("div");
+    meta.className = "user-meta";
+    const name = document.createElement("span");
+    name.className = "user-name";
+    name.textContent = session.user.fullName;
+    const handle = document.createElement("span");
+    handle.className = "user-handle";
+    handle.textContent = `@${session.user.username}`;
+    meta.append(name, handle);
+    account.append(avatar, meta);
+    document.getElementById("composer-avatar").textContent = avatar.textContent;
+    await initComments();
+    initLikes();
+    initFollows();
+    initFeed();
+  </script>
+</body>
+</html>

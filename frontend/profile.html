@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#edf3ef" />
+  <title>Profile · Social</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/profile.css" />
+  <link rel="stylesheet" href="/static/css/responsive.css" />
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar-left">
+      <a href="/" class="brand"><span class="brand-mark"><svg class="icon"><use href="/static/assets/icons.svg#i-sparkles"></use></svg></span><span>Social</span></a>
+      <nav aria-label="Main navigation">
+        <a href="/"><svg class="icon"><use href="/static/assets/icons.svg#i-home"></use></svg><span>Home</span></a>
+        <a href="/explore"><svg class="icon"><use href="/static/assets/icons.svg#i-compass"></use></svg><span>Explore</span></a>
+        <a href="/profile" id="my-profile-link" class="active"><svg class="icon"><use href="/static/assets/icons.svg#i-user"></use></svg><span>My profile</span></a>
+        <div class="nav-divider"></div><p class="nav-caption">Your space</p>
+        <a href="#" id="logout-link"><svg class="icon"><use href="/static/assets/icons.svg#i-log-out"></use></svg><span>Log out</span></a>
+      </nav>
+      <div class="sidebar-user" id="sidebar-account" hidden></div>
+    </aside>
+
+    <main class="feed-column">
+      <header class="page-heading"><div><span class="eyebrow">A closer look</span><h1>Profile</h1><p>Get to know someone in the community.</p></div></header>
+      <div id="profile-root">
+        <div class="loading">Loading profile...</div>
+      </div>
+      <div class="profile-tabs"><a href="#user-posts" class="active">Posts</a><a href="#profile-root">About</a></div>
+      <div id="user-posts"></div>
+    </main>
+
+    <aside class="sidebar-right" aria-label="Discover">
+      <section class="side-panel"><h2>People to know</h2><div id="discover"><div class="loading">Finding people...</div></div><a class="side-note" href="/explore">Explore the community <span aria-hidden="true">→</span></a></section>
+      <footer class="sidebar-footer">Social · Made for sharing ideas</footer>
+    </aside>
+  </div>
+
+  <script type="module">
+    import { initProfile } from "/static/js/profile.js";
+    import { initFollows } from "/static/js/follows.js";
+    import { initLikes } from "/static/js/likes.js";
+    import { initComments } from "/static/js/comments.js";
+    import { api } from "/static/js/api.js";
+
+    let currentUser = null;
+    try {
+      const me = await api.get("/api/auth/me");
+      currentUser = me.data.user;
+      document.getElementById("my-profile-link").href =
+        `/profile?username=${encodeURIComponent(currentUser.username)}`;
+      const account = document.getElementById("sidebar-account");
+      account.hidden = false;
+      const avatar = document.createElement("div");
+      avatar.className = "avatar avatar-small";
+      avatar.textContent = currentUser.fullName.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+      const meta = document.createElement("div");
+      meta.className = "user-meta";
+      const name = document.createElement("span");
+      name.className = "user-name";
+      name.textContent = currentUser.fullName;
+      const handle = document.createElement("span");
+      handle.className = "user-handle";
+      handle.textContent = `@${currentUser.username}`;
+      meta.append(name, handle);
+      account.append(avatar, meta);
+    } catch (err) {
+      const logout = document.getElementById("logout-link");
+      logout.href = "/login";
+      logout.querySelector("span").textContent = "Log in";
+    }
+
+    document.getElementById("logout-link").addEventListener("click", async (event) => {
+      if (!currentUser) return;
+      event.preventDefault();
+      try { await api.post("/api/auth/logout"); } finally { window.location.href = "/login"; }
+    });
+
+    await initComments();
+    initLikes();
+    initFollows();
+    initProfile();
+  </script>
+</body>
+</html>

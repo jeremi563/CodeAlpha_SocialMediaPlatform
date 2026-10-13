@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1f624d" />
+  <title>Sign up · Social</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/auth.css" />
+  <link rel="stylesheet" href="/static/css/responsive.css" />
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+  <div class="auth-wrap">
+    <aside class="auth-art" aria-label="Social community">
+      <a href="/" class="brand"><span class="brand-mark"><svg class="icon"><use href="/static/assets/icons.svg#i-sparkles"></use></svg></span><span>Social</span></a>
+      <div class="auth-art-copy"><span class="eyebrow">Make room for new ideas</span><h2>Your next good conversation starts here.</h2><p>Build a profile, follow curious people, and share what's on your mind.</p></div>
+      <div class="auth-art-foot">A thoughtful little corner of the internet.</div>
+    </aside>
+    <main class="auth-panel">
+      <section class="auth-card">
+        <a href="/" class="auth-back"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-arrow-left"></use></svg>Back to Social</a>
+        <span class="eyebrow">Join the community</span>
+        <h1>Create your account.</h1>
+        <p class="subtitle">A few details and you're on your way.</p>
+        <div class="auth-error" id="auth-error" role="alert" aria-live="polite"></div>
+        <form id="register-form" class="auth-form" novalidate>
+          <div class="auth-field"><label for="fullName">Full name</label><input type="text" id="fullName" name="fullName" required maxlength="80" autocomplete="name" placeholder="Your name" /></div>
+          <div class="auth-field"><label for="username">Username</label><input type="text" id="username" name="username" required minlength="3" maxlength="20" pattern="[a-z0-9_]{3,20}" autocomplete="username" placeholder="lowercase_username" /></div>
+          <div class="auth-field"><label for="email">Email address</label><input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com" /></div>
+          <div class="auth-field"><label for="password">Password</label><input type="password" id="password" name="password" required minlength="8" maxlength="72" autocomplete="new-password" placeholder="At least 8 characters" /></div>
+          <div class="auth-field"><label for="confirm">Confirm password</label><input type="password" id="confirm" name="confirm" required minlength="8" maxlength="72" autocomplete="new-password" placeholder="Enter it once more" /></div>
+          <button type="submit" class="btn btn-primary btn-wide" id="submit-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-plus"></use></svg><span>Create account</span></button>
+        </form>
+        <p class="auth-switch">Already part of Social? <a href="/login">Sign in</a></p>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { api, ApiError } from "/static/js/api.js";
+
+    const form = document.getElementById("register-form");
+    const errorBox = document.getElementById("auth-error");
+    const submitBtn = document.getElementById("submit-btn");
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.classList.add("visible");
+    }
+    function clearError() {
+      errorBox.textContent = "";
+      errorBox.classList.remove("visible");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearError();
+
+      const data = {
+        fullName: form.elements.fullName.value.trim(),
+        username: form.elements.username.value.trim().toLowerCase(),
+        email: form.elements.email.value.trim().toLowerCase(),
+        password: form.elements.password.value,
+      };
+      const confirm = form.elements.confirm.value;
+
+      // Frontend validation (Section 6.3: "frontend will validate required fields")
+      if (!data.fullName || !data.username || !data.email || !data.password) {
+        return showError("All fields are required.");
+      }
+      if (!/^[a-z0-9_]{3,20}$/.test(data.username)) {
+        return showError("Username must be 3–20 characters: lowercase letters, numbers, underscores.");
+      }
+      if (data.password.length < 8) {
+        return showError("Password must be at least 8 characters.");
+      }
+      if (data.password !== confirm) {
+        return showError("Passwords do not match.");
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.querySelector("span").textContent = "Creating account...";
+
+      try {
+        await api.post("/api/auth/register", data);
+        window.location.href = "/login?registered=1";
+      } catch (err) {
+        if (err instanceof ApiError && err.errors.length) {
+          showError(err.errors.map((e) => e.message).join(" "));
+        } else {
+          showError(err.message || "Registration failed.");
+        }
+        submitBtn.disabled = false;
+        submitBtn.querySelector("span").textContent = "Create account";
+      }
+    });
+  </script>
+</body>
+</html>

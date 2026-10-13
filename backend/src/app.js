@@ -1,4 +1,6 @@
 import express from 'express';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createSessionMiddleware } from './config/session.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
@@ -6,12 +8,17 @@ import postRoutes from './routes/post.routes.js';
 import commentRoutes from './routes/comment.routes.js';
 import followRoutes from './routes/follow.routes.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const FRONTEND_DIR = path.resolve(__dirname, '../../frontend');
+
 export function createApp() {
     const app = express();
 
     if(process.env.NODE_ENV === 'production') {
         app.set('trust proxy', 1); // trust first proxy
     }
+    app.use('/static', express.static(FRONTEND_DIR));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(createSessionMiddleware());
@@ -24,6 +31,14 @@ export function createApp() {
             environment: process.env.NODE_ENV || 'development'
         })
     })
+
+
+    // Serve HTML pages
+app.get("/", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "index.html")));
+app.get("/login", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "login.html")));
+app.get("/register", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "register.html")));
+app.get("/profile", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "profile.html")));
+app.get("/explore", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "explore.html")));
 
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);

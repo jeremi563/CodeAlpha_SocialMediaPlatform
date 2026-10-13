@@ -1,6 +1,6 @@
-# Mini Social Media App 🌐
+# Social Media Platform
 
-A lightweight, full-stack social media web application designed to connect users through profiles, posts, comments, likes, and a follow system. 
+A lightweight, full-stack social media web application built with a vanilla HTML/CSS/JavaScript frontend, Express API, and MongoDB.
 
 ---
 
@@ -15,9 +15,9 @@ A lightweight, full-stack social media web application designed to connect users
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript (or modern framework equivalents)
-- **Backend:** Express.js (Node.js) *or* Django (Python)
-- **Database:** Relational Database (e.g., PostgreSQL / SQLite / MongoDB)
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript
+- **Backend:** Node.js and Express.js
+- **Database:** MongoDB with Mongoose
 
 ---
 
@@ -33,48 +33,31 @@ Make sure you have the following installed on your system:
 
 ### Installation
 
-1. **Clone the repository:**
+1. **Install backend dependencies:**
    ```bash
-   git clone https://github.com/your-username/mini-social-media-app.git
-   cd mini-social-media-app
+  cd backend
+  npm install
    ```
 
-2. **Backend Setup:**
-   - *If using Express.js:*
-     ```bash
-     cd backend
-     npm install
-     ```
-   - *If using Django:*
-     ```bash
-     cd backend
-     python -m venv venv
-     source venv/bin/activate  # On Windows use: venv\Scripts\activate
-     pip install -r requirements.txt
-     ```
+2. **Configure the environment:** create `backend/.env` using `backend/.env.example` and set a MongoDB URI and session secret.
 
-3. **Database Configuration:**
-   - Set up your database environment variables (e.g., creating a `.env` file based on `.env.example`).
-   - Run database migrations:
-     - *Express.js:* `npm run migrate`
-     - *Django:* `python manage.py migrate`
+3. **Start the integrated application:**
+  ```bash
+  npm start
+  ```
+  For development with automatic restarts, run `npm run dev` instead. Both commands start the API and serve the frontend from the same Express process.
 
-4. **Running the Application:**
-   - Start the backend server:
-     - *Express.js:* `npm run dev`
-     - *Django:* `python manage.py runserver`
-   - Open your browser and navigate to `http://localhost:3000` (or the port specified by your backend).
+4. Open `http://localhost:5000` (or the configured `PORT`). The login, registration, feed, explore, and profile pages are served by the backend.
 
 ---
 
 ## 📂 Project Structure
 
 ```text
-mini-social-media-app/
+social-media-platform/
 │
 ├── frontend/          # HTML, CSS, and client-side JavaScript
 ├── backend/           # Server-side logic (Django or Express)
-├── database/          # Schemas and migration scripts
 └── README.md          # Project documentation
 ```
 
