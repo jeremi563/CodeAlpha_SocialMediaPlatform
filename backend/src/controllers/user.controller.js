@@ -1,6 +1,7 @@
 import { validationResult } from "express-validator";
 import * as userService from "../services/user.service.js";
 import { PAGINATION } from "../config/constants.js";
+import * as followService from "../services/follow.service.js";
 
 /**
  * Strips any fields that should never appear in a public response,
@@ -64,11 +65,16 @@ export async function getProfile(req, res, next) {
 
     const stats = await userService.getProfileStats(user._id);
 
+    const isFollowing = req.userId
+      ? await followService.isFollowing(req.userId, user._id)
+      : false;
+
     return res.status(200).json({
       success: true,
       data: {
         user: toPublicUser(user),
-        stats,
+        stats:{ ...stats, isFollowing },
+        
       },
     });
   } catch (err) {

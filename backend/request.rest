@@ -382,8 +382,75 @@ DELETE {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID/likes
 
 ### ---- Phase 7: Follows ----
 
-### 6.18 Follow a user
-POST {{baseUrl}}/api/users/REPLACE_WITH_USER_ID/follow
+### Test accounts: followone / StrongPass123 and followtwo / StrongPass456
+### These accounts are already registered in the current development database.
+### Use the profile response to copy followtwo's user id for the requests below.
+
+### 7.1 Get the target user's profile and user id
+GET {{baseUrl}}/api/users/followtwo
+
+### 7.2 Login as the follower (followone)
+# @name phase7LoginA
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "identifier": "followone",
+  "password": "StrongPass123"
+}
+
+### 7.3 Follow followtwo - expect 201 on first follow
+POST {{baseUrl}}/api/users/REPLACE_WITH_FOLLOWTWO_USER_ID/follow
+
+### 7.4 Follow followtwo again - expect 200, no duplicate relationship
+POST {{baseUrl}}/api/users/REPLACE_WITH_FOLLOWTWO_USER_ID/follow
+
+### 7.5 Attempt to follow yourself - expect 400
+POST {{baseUrl}}/api/users/REPLACE_WITH_FOLLOWONE_USER_ID/follow
+
+### 7.6 Get followtwo's followers - followone should be listed
+GET {{baseUrl}}/api/users/followtwo/followers?page=1&limit=10
+
+### 7.7 Get followone's following list - followtwo should be listed
+GET {{baseUrl}}/api/users/followone/following?page=1&limit=10
+
+### 7.8 Login as the other account to verify only the follower can unfollow
+# @name phase7LoginB
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "identifier": "followtwo",
+  "password": "StrongPass456"
+}
+
+### 7.9 Attempt to remove followone's relationship as followtwo - expect 200, unchanged
+DELETE {{baseUrl}}/api/users/REPLACE_WITH_FOLLOWONE_USER_ID/follow
+
+### 7.10 Login back as followone before unfollowing
+# @name phase7LoginAAgain
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "identifier": "followone",
+  "password": "StrongPass123"
+}
+
+### 7.11 Unfollow followtwo - expect 200 and isFollowing false
+DELETE {{baseUrl}}/api/users/REPLACE_WITH_FOLLOWTWO_USER_ID/follow
+
+### 7.12 Unfollow again - expect 200, idempotent no-op
+DELETE {{baseUrl}}/api/users/REPLACE_WITH_FOLLOWTWO_USER_ID/follow
+
+### 7.13 Follow without login - expect 401 (clear the REST Client cookie first)
+POST {{baseUrl}}/api/users/REPLACE_WITH_FOLLOWTWO_USER_ID/follow
+
+### 7.14 Follow with malformed user id - expect 400
+POST {{baseUrl}}/api/users/not-a-valid-id/follow
+
+### 7.15 Follow a valid but nonexistent user id - expect 404
+POST {{baseUrl}}/api/users/507f1f77bcf86cd799439011/follow
 
 ### 6.19 Unfollow a user
 DELETE {{baseUrl}}/api/users/REPLACE_WITH_USER_ID/follow
