@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment variables (Section 12.9 - never commit .env)
+.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

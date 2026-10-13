@@ -1,0 +1,2279 @@
+# SOCIAL MEDIA PLATFORM
+## Complete System Design and Technical Documentation
+**Project Type:** Mini Social Media Web Application  
+**Development Approach:** Minimum Viable Product (MVP)  
+**Backend:** Node.js with Express.js  
+**Frontend:** HTML5, CSS3, and Vanilla JavaScript  
+**Database:** MongoDB  
+**Database Driver:** MongoDB Node.js Driver or Mongoose  
+**Architecture:** Client–Server Architecture with RESTful API  
+**Document Version:** 1.0  
+**Status:** Proposed System Design
+
+---
+
+# 1. INTRODUCTION
+
+## 1.1 Project Overview
+
+The Social Media Platform is a web-based application that allows users to create accounts, manage personal profiles, publish posts, comment on posts, like content, and follow other users.
+
+The system aims to provide a simple, interactive environment where users can share their thoughts, engage with other users, and discover content published by the community.
+
+The application will be developed using HTML, CSS, and vanilla JavaScript for the frontend, Express.js and Node.js for the backend, and MongoDB for data persistence.
+
+The initial implementation will follow a Minimum Viable Product (MVP) approach. This means the system will prioritize essential social networking functionality while maintaining a structure that supports future improvements.
+
+The application will use a RESTful API to facilitate communication between the frontend and backend.
+
+## 1.2 Problem Statement
+
+Social networking applications provide platforms for sharing information, connecting with people, and interacting with online communities.
+
+However, developing a complete social networking platform can introduce unnecessary complexity when the initial objective is to demonstrate the fundamental concepts of social interaction, database management, authentication, and web application development.
+
+This project addresses that challenge by developing a lightweight social media application that implements the essential functionality of a social network without introducing advanced features that are unnecessary for the initial release.
+
+The application will demonstrate how users, posts, comments, likes, and follower relationships can be managed through a structured web application.
+
+## 1.3 Project Objectives
+
+The main objective is to develop a functional mini social media platform using modern web development technologies.
+
+The specific objectives are:
+
+1. To implement user registration and authentication.
+2. To allow users to create and manage their profiles.
+3. To enable authenticated users to publish and manage posts.
+4. To implement a chronological feed for displaying posts.
+5. To allow users to like and unlike posts.
+6. To enable users to comment on posts.
+7. To implement follow and unfollow functionality.
+8. To display user profiles with their posts, followers, and following counts.
+9. To provide user search and discovery functionality.
+10. To implement secure communication between the frontend and backend.
+11. To store application data persistently using MongoDB.
+12. To create a responsive interface that works on desktop and mobile devices.
+
+## 1.4 Project Scope
+
+The initial release will support the following functionality:
+
+- User registration.
+- User login and logout.
+- User profile management.
+- Text-based post creation.
+- Post retrieval and chronological feeds.
+- Post editing and deletion.
+- Comments on posts.
+- Editing and deletion of owned comments.
+- Liking and unliking posts.
+- Following and unfollowing users.
+- Displaying followers and following.
+- Searching for users.
+- Viewing public user profiles.
+- Responsive interface design.
+- Basic application security and input validation.
+
+The initial release will not include private messaging, live streaming, stories, video uploads, advanced recommendation algorithms, or real-time notifications.
+
+These features may be introduced in future versions.
+
+---
+
+# 2. TECHNOLOGY STACK
+
+## 2.1 Frontend Technologies
+
+### HTML5
+
+HTML5 will provide the structure of the application.
+
+It will define page layouts, navigation, forms, post containers, profile sections, and interactive elements.
+
+### CSS3
+
+CSS3 will control the appearance and layout of the application.
+
+It will be used to implement:
+
+- Responsive layouts.
+- Navigation components.
+- Post cards.
+- Profile pages.
+- Form styling.
+- Buttons and interactive states.
+- Mobile layouts.
+- Loading indicators and empty states.
+
+### Vanilla JavaScript
+
+Vanilla JavaScript will provide the frontend application logic.
+
+It will handle:
+
+- Form validation.
+- Sending HTTP requests to the backend.
+- Authentication-related interactions.
+- Retrieving and displaying posts.
+- Creating posts without unnecessary page reloads.
+- Handling likes and comments.
+- Managing follow and unfollow interactions.
+- Displaying errors and success messages.
+- Updating interface elements after successful operations.
+
+The Fetch API and async/await will be used for communication with the backend.
+
+No frontend framework is required for the MVP.
+
+## 2.2 Backend Technologies
+
+### Node.js
+
+Node.js will provide the JavaScript runtime for executing server-side application logic.
+
+### Express.js
+
+Express.js will handle HTTP requests, routing, middleware, authentication integration, and REST API responses.
+
+The backend will be responsible for enforcing application rules and controlling access to protected operations.
+
+### Mongoose
+
+Mongoose is the recommended database object modeling library for this project.
+
+It will provide:
+
+- MongoDB connection management.
+- Schema definitions.
+- Data validation.
+- Model-based database operations.
+- Relationship references.
+- Index definitions.
+- Middleware for selected database operations.
+
+We will use Mongoose to keep the database layer organized and maintainable.
+
+## 2.3 Database
+
+MongoDB will store application data in collections.
+
+The database will contain collections for:
+
+1. Users.
+2. Posts.
+3. Comments.
+4. Likes.
+5. Follows.
+
+The design will use MongoDB documents and references to represent relationships between users, posts, comments, likes, and follows.
+
+We will use separate collections for likes and follows rather than embedding all those relationships inside user documents.
+
+This approach is more suitable for a social platform because these relationships can grow independently as the application gains users.
+
+## 2.4 Security and Supporting Packages
+
+The proposed supporting packages are:
+
+- `bcrypt` or `bcryptjs` for password hashing.
+- `express-session` for session-based authentication.
+- `connect-mongo` for persistent session storage in MongoDB.
+- `express-validator` for request validation.
+- `helmet` for security-related HTTP headers.
+- `express-rate-limit` for limiting repeated requests.
+- `dotenv` for environment configuration.
+- `cors` if the deployment architecture requires cross-origin requests.
+- `mongoose` for database interaction.
+
+We will only install packages that are needed for the selected implementation.
+
+---
+
+# 3. SYSTEM REQUIREMENTS
+
+## 3.1 Functional Requirements
+
+Functional requirements describe the operations the application must support.
+
+### FR-01: User Registration
+
+The system shall allow new users to register using their full names, usernames, email addresses, and passwords.
+
+The system shall validate registration data before creating an account.
+
+Usernames and email addresses must be unique.
+
+Passwords shall be hashed before being stored.
+
+### FR-02: User Authentication
+
+The system shall allow registered users to log in using their credentials.
+
+The system shall verify credentials and establish an authenticated session.
+
+The system shall allow authenticated users to log out.
+
+Protected operations shall require valid authentication.
+
+### FR-03: User Profiles
+
+The system shall provide a public profile for every registered user.
+
+Profiles shall display the user's name, username, biography, posts, follower count, and following count.
+
+Authenticated users shall be able to update their own profile information.
+
+Users shall not be allowed to modify another user's profile.
+
+### FR-04: Post Creation
+
+The system shall allow authenticated users to publish text posts.
+
+The system shall validate post content before saving it.
+
+The system shall associate every post with its author.
+
+The system shall record creation and update timestamps.
+
+### FR-05: Post Retrieval
+
+The system shall retrieve posts and display them in reverse chronological order.
+
+Each post shall display its author, content, publication time, like count, and comment count.
+
+The system shall support pagination to avoid loading all posts simultaneously.
+
+### FR-06: Post Management
+
+The system shall allow users to edit and delete their own posts.
+
+Users shall not be allowed to edit or delete posts belonging to other users.
+
+### FR-07: Comments
+
+The system shall allow authenticated users to comment on posts.
+
+Comments shall be associated with their authors and the relevant posts.
+
+Users shall be able to edit and delete their own comments.
+
+The system shall display comments in a consistent order.
+
+### FR-08: Likes
+
+The system shall allow authenticated users to like and unlike posts.
+
+A user shall not be able to create duplicate likes for the same post.
+
+The system shall display the total number of likes associated with each post.
+
+### FR-09: Following
+
+The system shall allow authenticated users to follow and unfollow other users.
+
+Users shall not be allowed to follow themselves.
+
+Duplicate follow relationships shall be prevented.
+
+### FR-10: Followers and Following
+
+The system shall display the number of followers and followed accounts associated with each user.
+
+The system shall allow users to view follower and following lists.
+
+### FR-11: User Search
+
+The system shall allow users to search for other accounts using usernames.
+
+Search results shall provide links to the corresponding profiles.
+
+### FR-12: Responsive Interface
+
+The system shall provide a responsive interface suitable for desktop, tablet, and mobile devices.
+
+## 3.2 Non-Functional Requirements
+
+### Performance
+
+The application should retrieve paginated feeds efficiently.
+
+Database indexes shall be created for frequently queried fields.
+
+The frontend should avoid unnecessary API requests.
+
+### Security
+
+Passwords shall never be stored in plain text.
+
+Protected routes shall require authentication.
+
+Users shall only be allowed to modify resources they own.
+
+All database operations shall validate their inputs.
+
+User-generated content shall be rendered safely to reduce cross-site scripting risks.
+
+### Reliability
+
+The application shall handle invalid requests and database errors without crashing unnecessarily.
+
+The backend shall return consistent error responses.
+
+### Maintainability
+
+The backend shall use separate modules for routes, controllers, services, middleware, and database models.
+
+The frontend shall use separate JavaScript and CSS files for different responsibilities.
+
+### Scalability
+
+The application shall use pagination and appropriate database indexes.
+
+The data model shall support adding features without requiring a complete redesign.
+
+### Usability
+
+The interface shall provide clear navigation, readable content, useful feedback, and consistent interaction patterns.
+
+### Compatibility
+
+The application shall support modern browsers, including recent versions of Chrome, Firefox, Edge, and Safari.
+
+---
+
+# 4. SYSTEM ARCHITECTURE
+
+## 4.1 Architectural Overview
+
+The application will use a client–server architecture.
+
+The frontend will communicate with the Express backend through REST API endpoints.
+
+The backend will validate requests, enforce business rules, communicate with MongoDB, and return JSON responses.
+
+The frontend will use these responses to update the interface.
+
+The architecture consists of three primary layers.
+
+### Presentation Layer
+
+This layer consists of HTML, CSS, and vanilla JavaScript.
+
+Its responsibilities include displaying content, collecting user input, sending API requests, and updating the interface.
+
+### Application Layer
+
+This layer consists of Node.js and Express.js.
+
+Its responsibilities include request handling, authentication, authorization, input validation, business logic, and error handling.
+
+### Data Layer
+
+This layer consists of MongoDB and Mongoose.
+
+Its responsibilities include storing users, posts, comments, likes, follows, and persistent sessions.
+
+## 4.2 Request Flow
+
+When a user creates a post, the request follows this process:
+
+1. The user enters content in the frontend.
+2. JavaScript validates the input format.
+3. The frontend sends a POST request to the backend.
+4. Express receives the request.
+5. Authentication middleware verifies the user's session.
+6. Validation middleware checks the submitted content.
+7. The controller invokes the appropriate service logic.
+8. The service creates the post using the Mongoose model.
+9. MongoDB stores the new document.
+10. The backend returns the created post.
+11. The frontend displays the post in the feed.
+
+The same architectural pattern will be applied to other features.
+
+## 4.3 Architectural Principles
+
+The system shall follow these principles:
+
+- Separation of concerns.
+- Centralized error handling.
+- Server-side validation.
+- Secure authentication.
+- Explicit authorization.
+- Reusable middleware.
+- Consistent API responses.
+- Modular code organization.
+- Environment-based configuration.
+
+The MVP will use a modular monolithic architecture rather than microservices.
+
+This keeps deployment and development simple while preserving a structure that can be extended later.
+
+---
+
+# 5. DATABASE DESIGN
+
+## 5.1 Database Name
+
+The MongoDB database will be named:
+
+`social_media_platform`
+
+The database will initially contain five primary collections.
+
+- `users`
+- `posts`
+- `comments`
+- `likes`
+- `follows`
+
+A separate session collection may be created automatically by the configured session store.
+
+## 5.2 Users Collection
+
+The users collection will store account information and profile data.
+
+Each document will represent one registered user.
+
+### Proposed document structure
+
+- `_id`: Unique MongoDB ObjectId.
+- `fullName`: User's full name.
+- `username`: Unique username.
+- `email`: Unique email address.
+- `passwordHash`: Hashed password.
+- `bio`: Short profile description.
+- `createdAt`: Account creation timestamp.
+- `updatedAt`: Last profile update timestamp.
+
+### Example document
+
+    {
+      "_id": "ObjectId",
+      "fullName": "John Mwangi",
+      "username": "johnmwangi",
+      "email": "john@example.com",
+      "passwordHash": "HASHED_PASSWORD",
+      "bio": "Software developer and technology enthusiast",
+      "createdAt": "TIMESTAMP",
+      "updatedAt": "TIMESTAMP"
+    }
+
+The example is illustrative. Actual ObjectId and timestamp values will be generated by the application.
+
+### Validation rules
+
+- Full name is required.
+- Username is required and unique.
+- Email is required and unique.
+- Password must satisfy the defined password policy.
+- Bio is optional.
+- Username and email shall be normalized consistently.
+- Password hashes shall never be included in public API responses.
+
+### Indexes
+
+Unique indexes shall be created for usernames and email addresses.
+
+## 5.3 Posts Collection
+
+The posts collection will store content published by users.
+
+### Proposed document structure
+
+- `_id`: Unique post identifier.
+- `author`: Reference to the user who created the post.
+- `content`: Text content of the post.
+- `createdAt`: Creation timestamp.
+- `updatedAt`: Last modification timestamp.
+
+### Example document
+
+    {
+      "_id": "ObjectId",
+      "author": "USER_OBJECT_ID",
+      "content": "Today I started building my social media platform.",
+      "createdAt": "TIMESTAMP",
+      "updatedAt": "TIMESTAMP"
+    }
+
+### Relationships
+
+Each post references one user.
+
+One user can create multiple posts.
+
+The relationship is one-to-many.
+
+### Validation rules
+
+- The author reference is required.
+- Content must not be empty.
+- Content must contain no more than 2,000 characters.
+- Only the author may edit or delete the post.
+
+### Indexes
+
+The following indexes should be created:
+
+- Author and creation timestamp.
+- Creation timestamp for chronological feeds.
+
+## 5.4 Comments Collection
+
+The comments collection will store comments associated with posts.
+
+### Proposed document structure
+
+- `_id`: Unique comment identifier.
+- `post`: Reference to the post being commented on.
+- `author`: Reference to the user who created the comment.
+- `content`: Comment content.
+- `createdAt`: Creation timestamp.
+- `updatedAt`: Last modification timestamp.
+
+### Example document
+
+    {
+      "_id": "ObjectId",
+      "post": "POST_OBJECT_ID",
+      "author": "USER_OBJECT_ID",
+      "content": "Great work on the project!",
+      "createdAt": "TIMESTAMP",
+      "updatedAt": "TIMESTAMP"
+    }
+
+### Relationships
+
+One post can have multiple comments.
+
+One user can create multiple comments.
+
+Every comment references one post and one author.
+
+### Validation rules
+
+- The post reference is required.
+- The author reference is required.
+- Comment content must not be empty.
+- Comment content must not exceed the configured maximum length.
+- Only the author may edit or delete the comment.
+
+### Indexes
+
+An index shall be created on the post reference and creation timestamp.
+
+## 5.5 Likes Collection
+
+The likes collection will store relationships between users and posts they like.
+
+Each document represents one like.
+
+### Proposed document structure
+
+- `_id`: Unique like identifier.
+- `user`: Reference to the user who liked the post.
+- `post`: Reference to the liked post.
+- `createdAt`: Timestamp indicating when the like was created.
+
+### Example document
+
+    {
+      "_id": "ObjectId",
+      "user": "USER_OBJECT_ID",
+      "post": "POST_OBJECT_ID",
+      "createdAt": "TIMESTAMP"
+    }
+
+### Validation rules
+
+- The user reference is required.
+- The post reference is required.
+- Duplicate likes shall be prevented.
+- Only authenticated users may create or remove their own likes.
+
+A compound unique index shall be created on `user` and `post`.
+
+This ensures that the same user cannot like the same post more than once.
+
+### Like count
+
+The application can calculate a post's like count by counting matching documents in the likes collection.
+
+For the initial implementation, this is a straightforward approach.
+
+If performance becomes a problem as the application grows, we can consider maintaining a denormalized like count on the post document.
+
+## 5.6 Follows Collection
+
+The follows collection will store relationships between users.
+
+Each document represents one user following another.
+
+### Proposed document structure
+
+- `_id`: Unique relationship identifier.
+- `follower`: Reference to the user initiating the follow.
+- `following`: Reference to the user being followed.
+- `createdAt`: Timestamp indicating when the relationship was created.
+
+### Example document
+
+    {
+      "_id": "ObjectId",
+      "follower": "ALICE_OBJECT_ID",
+      "following": "BRIAN_OBJECT_ID",
+      "createdAt": "TIMESTAMP"
+    }
+
+### Relationship interpretation
+
+If Alice follows Brian:
+
+- `follower` refers to Alice.
+- `following` refers to Brian.
+
+This direction must remain consistent throughout the application.
+
+### Validation rules
+
+- Both user references are required.
+- A user cannot follow themselves.
+- Duplicate relationships shall be prevented.
+- Only authenticated users may create or remove their own follow relationships.
+
+A compound unique index shall be created on `follower` and `following`.
+
+Additional indexes shall support retrieving followers and followed accounts efficiently.
+
+## 5.7 Session Collection
+
+If we use MongoDB-backed sessions, the session store will maintain session information in a separate collection.
+
+This collection will be managed by the session storage library.
+
+Sessions should expire according to the configured session lifetime.
+
+The session collection shall not be exposed through public API endpoints.
+
+## 5.8 Database Relationship Summary
+
+The principal relationships are:
+
+- One user can create many posts.
+- One user can create many comments.
+- One post can have many comments.
+- One user can like many posts.
+- One post can receive likes from many users.
+- One user can follow many users.
+- One user can have many followers.
+
+The relationships for likes and follows are many-to-many relationships represented by separate collections.
+
+The relationships for posts and comments are represented through references to their parent documents.
+
+## 5.9 MongoDB Data Modeling Strategy
+
+We will use references for posts, comments, likes, and follows rather than embedding every related document inside a user or post document.
+
+This design has several benefits:
+
+- User documents remain relatively small.
+- Post documents do not grow indefinitely as comments accumulate.
+- Like and follow relationships can be queried independently.
+- Unique indexes can enforce relationship constraints.
+- Individual records can be managed without rewriting large documents.
+
+Where useful, Mongoose population or explicit queries can retrieve related user information.
+
+We should avoid excessive population and large unpaginated queries.
+
+## 5.10 Data Deletion Strategy
+
+The application must define how related records are handled when a user or post is deleted.
+
+When a post is deleted, its associated comments and likes should also be removed.
+
+When a user account is permanently deleted, the system must clean up the user's posts, comments, likes, follows, and sessions.
+
+These operations should be handled through carefully designed service logic.
+
+MongoDB does not automatically enforce cascading deletion through references in the same way that relational foreign keys do.
+
+The application must therefore explicitly manage related documents.
+
+For operations involving several collections, MongoDB transactions may be considered where supported by the deployment configuration. Otherwise, the application must use an appropriate cleanup strategy to handle partial failures.
+
+---
+
+# 6. USER INTERFACE DESIGN
+
+## 6.1 Design Philosophy
+
+The interface will be simple, modern, responsive, and easy to navigate.
+
+The design should emphasize readability and make the content feed the central part of the application.
+
+The interface will use a consistent visual system across authentication pages, the home feed, profiles, and user discovery.
+
+## 6.2 Main Layout
+
+The desktop application will use three primary sections.
+
+### Left Sidebar
+
+The left sidebar will contain:
+
+- Application logo.
+- Home.
+- Explore.
+- My Profile.
+- Logout.
+
+The sidebar will provide consistent navigation between the main application pages.
+
+### Centre Feed
+
+The centre column will contain:
+
+- Post creation form.
+- Chronological post feed.
+- Post author information.
+- Post content.
+- Like controls.
+- Comment controls.
+- Pagination.
+
+This is the primary interaction area.
+
+### Right Sidebar
+
+The right sidebar will contain a user discovery section.
+
+It may display users whom the current user does not follow.
+
+Each user entry will include a username, a link to the profile, and a Follow button.
+
+The initial implementation does not require an advanced recommendation algorithm.
+
+## 6.3 Registration Page
+
+The registration page will be implemented in `register.html`.
+
+It will contain:
+
+- Full name field.
+- Username field.
+- Email field.
+- Password field.
+- Password confirmation field.
+- Create Account button.
+- Link to the login page.
+
+The frontend will validate required fields and basic input formats.
+
+The backend will independently validate all submitted data.
+
+Password confirmation will be checked by the frontend, while the password itself will be securely processed by the backend.
+
+## 6.4 Login Page
+
+The login page will be implemented in `login.html`.
+
+It will contain:
+
+- Email or username field.
+- Password field.
+- Login button.
+- Link to registration.
+
+After successful authentication, the user will be redirected to the home feed.
+
+If authentication fails, the interface will display an appropriate error message.
+
+## 6.5 Home Feed
+
+The home feed will be implemented in `index.html`.
+
+It will contain a post composer followed by a list of posts.
+
+Each post card will display:
+
+- Author's display name.
+- Author's username.
+- Publication timestamp.
+- Post content.
+- Like count.
+- Comment count.
+- Like or Unlike button.
+- Comment interaction.
+- Post management controls when the current user owns the post.
+
+The feed will initially display recent posts from all users.
+
+A later enhancement may restrict or prioritize posts from followed accounts.
+
+## 6.6 Profile Page
+
+The profile page will be implemented in `profile.html`.
+
+It will display:
+
+- Full name.
+- Username.
+- Biography.
+- Total posts.
+- Follower count.
+- Following count.
+- Follow or Unfollow button when viewing another user's profile.
+- Edit Profile button when viewing the current user's profile.
+- The user's posts.
+
+Profile management controls shall only be displayed when appropriate.
+
+Displaying or hiding a button is not sufficient to protect an operation. The backend must independently enforce authorization.
+
+## 6.7 Explore Page
+
+The explore page will be implemented in `explore.html`.
+
+It will contain:
+
+- Username search field.
+- Search button or interactive search behaviour.
+- Search results.
+- Profile links.
+- Follow and Unfollow controls.
+
+Search results shall be generated from actual database records rather than hardcoded sample accounts.
+
+## 6.8 Responsive Design
+
+The interface shall adapt to different screen sizes.
+
+On desktop:
+
+- The left sidebar remains visible.
+- The feed occupies the centre column.
+- The discovery section appears on the right.
+
+On mobile:
+
+- The layout becomes a single-column feed.
+- Secondary navigation elements may be collapsed.
+- Buttons remain easy to interact with.
+- Text remains readable.
+- Cards fit the available screen width.
+
+The interface should use flexible layouts and CSS media queries.
+
+## 6.9 UI States
+
+The frontend shall handle the following states:
+
+- Loading.
+- Successful data retrieval.
+- Empty feed.
+- Empty search results.
+- Empty comments.
+- Failed network requests.
+- Authentication expiration.
+- Invalid form submissions.
+- Successful post creation.
+- Successful like or follow operations.
+
+The application should provide clear feedback rather than leaving users uncertain about whether an action succeeded.
+
+---
+
+# 7. FRONTEND STRUCTURE
+
+The frontend will use plain HTML, CSS, and JavaScript.
+
+The proposed structure is:
+
+    frontend/
+    |
+    |-- index.html
+    |-- login.html
+    |-- register.html
+    |-- profile.html
+    |-- explore.html
+    |
+    |-- css/
+    |   |-- main.css
+    |   |-- auth.css
+    |   |-- profile.css
+    |   |-- responsive.css
+    |
+    |-- js/
+    |   |-- api.js
+    |   |-- auth.js
+    |   |-- feed.js
+    |   |-- profile.js
+    |   |-- comments.js
+    |   |-- likes.js
+    |   |-- follows.js
+    |   |-- explore.js
+    |
+    |-- assets/
+        |-- images/
+        |-- icons/
+
+## 7.1 API Utility Module
+
+The `api.js` file will contain reusable functions for communicating with the backend.
+
+It will help standardize:
+
+- HTTP requests.
+- JSON serialization.
+- Error handling.
+- Credentials handling.
+- API response processing.
+
+This avoids duplicating request logic across multiple JavaScript files.
+
+## 7.2 Authentication Module
+
+The `auth.js` file will handle:
+
+- Registration form submission.
+- Login form submission.
+- Logout requests.
+- Current-user retrieval.
+- Authentication-related interface updates.
+
+The session cookie will be managed by the browser rather than manually exposing the session identifier to JavaScript.
+
+## 7.3 Feed Module
+
+The `feed.js` file will handle:
+
+- Retrieving posts.
+- Rendering post cards.
+- Creating posts.
+- Deleting owned posts.
+- Loading additional pages.
+- Displaying feed-related errors.
+
+## 7.4 Comments Module
+
+The `comments.js` file will handle:
+
+- Retrieving comments.
+- Submitting comments.
+- Displaying comment lists.
+- Editing and deleting owned comments.
+
+## 7.5 Likes Module
+
+The `likes.js` file will handle:
+
+- Sending like requests.
+- Sending unlike requests.
+- Updating like counts.
+- Displaying whether the current user has liked a post.
+
+## 7.6 Follows Module
+
+The `follows.js` file will handle:
+
+- Following users.
+- Unfollowing users.
+- Updating follow buttons.
+- Updating follower counts.
+
+## 7.7 Profile and Explore Modules
+
+The `profile.js` file will retrieve and display profile information.
+
+The `explore.js` file will manage username search and user discovery.
+
+All user-generated content shall be inserted into the DOM safely.
+
+The application shall not insert untrusted post or comment content directly into HTML without appropriate escaping.
+
+---
+
+# 8. BACKEND STRUCTURE
+
+The backend will be organized into modules according to responsibility.
+
+The proposed directory structure is:
+
+    backend/
+    |
+    |-- src/
+    |   |
+    |   |-- config/
+    |   |   |-- database.js
+    |   |   |-- session.js
+    |   |
+    |   |-- models/
+    |   |   |-- user.model.js
+    |   |   |-- post.model.js
+    |   |   |-- comment.model.js
+    |   |   |-- like.model.js
+    |   |   |-- follow.model.js
+    |   |
+    |   |-- routes/
+    |   |   |-- auth.routes.js
+    |   |   |-- user.routes.js
+    |   |   |-- post.routes.js
+    |   |   |-- comment.routes.js
+    |   |   |-- like.routes.js
+    |   |   |-- follow.routes.js
+    |   |
+    |   |-- controllers/
+    |   |   |-- auth.controller.js
+    |   |   |-- user.controller.js
+    |   |   |-- post.controller.js
+    |   |   |-- comment.controller.js
+    |   |   |-- like.controller.js
+    |   |   |-- follow.controller.js
+    |   |
+    |   |-- services/
+    |   |   |-- auth.service.js
+    |   |   |-- user.service.js
+    |   |   |-- post.service.js
+    |   |   |-- comment.service.js
+    |   |   |-- like.service.js
+    |   |   |-- follow.service.js
+    |   |
+    |   |-- middleware/
+    |   |   |-- auth.middleware.js
+    |   |   |-- validate.middleware.js
+    |   |   |-- error.middleware.js
+    |   |
+    |   |-- validators/
+    |   |   |-- auth.validator.js
+    |   |   |-- post.validator.js
+    |   |   |-- comment.validator.js
+    |   |
+    |   |-- app.js
+    |   |-- server.js
+    |
+    |-- tests/
+    |
+    |-- .env
+    |-- .env.example
+    |-- .gitignore
+    |-- package.json
+
+This is the planned structure. Files will be created as development progresses.
+
+## 8.1 Configuration Module
+
+The configuration module will manage database and session configuration.
+
+It will read sensitive settings from environment variables.
+
+## 8.2 Models
+
+Models will define the structure and validation rules for MongoDB documents.
+
+They will also define indexes and references.
+
+## 8.3 Routes
+
+Routes will map HTTP methods and URL paths to the appropriate controller functions.
+
+Routes shall remain focused on request routing rather than containing extensive business logic.
+
+## 8.4 Controllers
+
+Controllers will receive requests and produce responses.
+
+They will extract validated input, invoke services, and return appropriate HTTP status codes.
+
+## 8.5 Services
+
+Services will implement business logic.
+
+Examples include:
+
+- Registering users.
+- Creating posts.
+- Enforcing ownership rules.
+- Processing likes.
+- Managing follows.
+- Cleaning up related documents.
+
+## 8.6 Middleware
+
+Middleware will provide reusable functionality.
+
+Authentication middleware will verify that a valid session exists.
+
+Validation middleware will validate requests before they reach the main business logic.
+
+Error middleware will standardize error responses.
+
+## 8.7 Application Entry Points
+
+The `app.js` file will configure Express, middleware, static file serving, and API routes.
+
+The `server.js` file will establish the database connection and start the HTTP server.
+
+This separation makes testing and configuration easier.
+
+---
+
+# 9. REST API SPECIFICATION
+
+All API endpoints will use the `/api` prefix.
+
+Requests and responses will primarily use JSON.
+
+## 9.1 Authentication Endpoints
+
+### POST /api/auth/register
+
+Purpose: Register a new user.
+
+Request fields:
+
+- `fullName`
+- `username`
+- `email`
+- `password`
+
+Successful response: HTTP 201 Created.
+
+The response shall contain the new user's public information and an appropriate success message.
+
+The password and password hash shall never be returned.
+
+### POST /api/auth/login
+
+Purpose: Authenticate a user.
+
+Request fields:
+
+- `identifier`
+- `password`
+
+The identifier may contain the user's username or email address.
+
+Successful response: HTTP 200 OK.
+
+The server will establish an authenticated session and set the appropriate session cookie.
+
+### POST /api/auth/logout
+
+Purpose: End the authenticated session.
+
+The server shall invalidate the session and clear the session cookie.
+
+Successful response: HTTP 200 OK.
+
+### GET /api/auth/me
+
+Purpose: Retrieve the currently authenticated user's public account information.
+
+Authentication: Required.
+
+Successful response: HTTP 200 OK.
+
+If the session is invalid or absent, the endpoint shall return HTTP 401 Unauthorized.
+
+## 9.2 User Endpoints
+
+### GET /api/users/search?q=username
+
+Purpose: Search for users.
+
+Authentication: Required for the initial implementation.
+
+The endpoint shall validate the search query and return a limited number of matching profiles.
+
+### GET /api/users/:username
+
+Purpose: Retrieve a public profile.
+
+The response shall contain public profile information, post count, follower count, and following count.
+
+### PATCH /api/users/me
+
+Purpose: Update the current user's profile.
+
+Authentication: Required.
+
+Editable fields may include:
+
+- Full name.
+- Username, subject to uniqueness validation.
+- Biography.
+
+Email changes may be introduced later with additional verification requirements.
+
+### GET /api/users/:username/posts
+
+Purpose: Retrieve posts belonging to a user.
+
+The endpoint shall support pagination.
+
+### GET /api/users/:username/followers
+
+Purpose: Retrieve the user's followers.
+
+The endpoint shall return a paginated list of public user information.
+
+### GET /api/users/:username/following
+
+Purpose: Retrieve accounts followed by the user.
+
+The endpoint shall return a paginated list of public user information.
+
+## 9.3 Post Endpoints
+
+### POST /api/posts
+
+Purpose: Create a post.
+
+Authentication: Required.
+
+Request field:
+
+- `content`
+
+The backend will derive the author from the authenticated session.
+
+Successful response: HTTP 201 Created.
+
+### GET /api/posts
+
+Purpose: Retrieve the main feed.
+
+The endpoint shall:
+
+- Retrieve recent posts.
+- Sort them by creation time in descending order.
+- Return author information.
+- Return like and comment counts.
+- Indicate whether the current user has liked each post.
+- Support pagination.
+
+For the initial release, the feed will display recent posts from all users.
+
+### GET /api/posts/:postId
+
+Purpose: Retrieve one post.
+
+The response may include post information, author information, and relevant interaction counts.
+
+### PATCH /api/posts/:postId
+
+Purpose: Edit a post.
+
+Authentication: Required.
+
+Authorization: The authenticated user must own the post.
+
+Request field:
+
+- `content`
+
+Successful response: HTTP 200 OK.
+
+### DELETE /api/posts/:postId
+
+Purpose: Delete a post.
+
+Authentication: Required.
+
+Authorization: The authenticated user must own the post.
+
+The server shall also remove the post's associated comments and likes.
+
+Successful response: HTTP 200 OK or HTTP 204 No Content.
+
+## 9.4 Comment Endpoints
+
+### POST /api/posts/:postId/comments
+
+Purpose: Add a comment to a post.
+
+Authentication: Required.
+
+Request field:
+
+- `content`
+
+Successful response: HTTP 201 Created.
+
+### GET /api/posts/:postId/comments
+
+Purpose: Retrieve comments associated with a post.
+
+The endpoint shall support pagination.
+
+### PATCH /api/comments/:commentId
+
+Purpose: Edit an existing comment.
+
+Authentication: Required.
+
+Authorization: The authenticated user must own the comment.
+
+### DELETE /api/comments/:commentId
+
+Purpose: Delete a comment.
+
+Authentication: Required.
+
+Authorization: The authenticated user must own the comment.
+
+The server shall update the resulting comment count automatically through the database query used to retrieve the post or its comments.
+
+## 9.5 Like Endpoints
+
+### POST /api/posts/:postId/likes
+
+Purpose: Like a post.
+
+Authentication: Required.
+
+The backend shall create a like relationship between the current user and the specified post.
+
+A duplicate relationship shall not be created.
+
+Successful response: HTTP 201 Created, or an appropriate response indicating that the like already exists.
+
+### DELETE /api/posts/:postId/likes
+
+Purpose: Unlike a post.
+
+Authentication: Required.
+
+The backend shall remove the like belonging to the current user and specified post.
+
+The endpoint shall not remove another user's like.
+
+Successful response: HTTP 200 OK or HTTP 204 No Content.
+
+## 9.6 Follow Endpoints
+
+### POST /api/users/:userId/follow
+
+Purpose: Follow a user.
+
+Authentication: Required.
+
+The backend shall reject attempts to follow oneself.
+
+It shall also prevent duplicate follow relationships.
+
+Successful response: HTTP 201 Created.
+
+### DELETE /api/users/:userId/follow
+
+Purpose: Unfollow a user.
+
+Authentication: Required.
+
+The backend shall remove only the relationship initiated by the current user.
+
+Successful response: HTTP 200 OK or HTTP 204 No Content.
+
+---
+
+# 10. API RESPONSE AND ERROR HANDLING
+
+## 10.1 Successful Responses
+
+Successful API responses should follow a consistent structure where a response body is appropriate.
+
+For example:
+
+    {
+      "success": true,
+      "message": "Post created successfully",
+      "data": {
+        "id": "POST_ID",
+        "content": "My first post"
+      }
+    }
+
+The example illustrates the response format.
+
+Actual responses will contain real database identifiers and timestamps.
+
+For endpoints returning HTTP 204 No Content, the server will not return a response body.
+
+## 10.2 Error Responses
+
+Error responses should use a consistent structure.
+
+Example:
+
+    {
+      "success": false,
+      "message": "Validation failed",
+      "errors": [
+        {
+          "field": "content",
+          "message": "Post content is required"
+        }
+      ]
+    }
+
+## 10.3 HTTP Status Codes
+
+The application will use the following status codes appropriately:
+
+- HTTP 200: Successful request.
+- HTTP 201: Resource created.
+- HTTP 204: Successful operation without a response body.
+- HTTP 400: Invalid request.
+- HTTP 401: Authentication required or invalid.
+- HTTP 403: Authenticated user lacks permission.
+- HTTP 404: Resource not found.
+- HTTP 409: Resource conflict, such as a duplicate username.
+- HTTP 422: Semantically invalid request, where used consistently.
+- HTTP 429: Rate limit exceeded.
+- HTTP 500: Unexpected server error.
+
+The backend shall not expose stack traces, database credentials, or internal implementation details in production error responses.
+
+---
+
+# 11. AUTHENTICATION AND AUTHORIZATION
+
+## 11.1 Authentication Method
+
+The MVP will use server-side sessions.
+
+The `express-session` package will manage session handling, while `connect-mongo` will persist sessions in MongoDB.
+
+This approach is suitable for a browser-based application that uses HTML, CSS, and vanilla JavaScript.
+
+## 11.2 Registration Process
+
+The registration process will follow these steps:
+
+1. The user submits the registration form.
+2. The backend validates the submitted data.
+3. The backend checks whether the username or email already exists.
+4. The password is hashed.
+5. A user document is created.
+6. The server returns the new account's public information.
+
+The system may redirect the user to the login page after registration.
+
+Automatically logging in after registration is optional and can be decided during implementation.
+
+## 11.3 Login Process
+
+The login process will follow these steps:
+
+1. The user submits an email address or username and password.
+2. The backend validates the input.
+3. The backend retrieves the corresponding user.
+4. The password is compared with the stored hash.
+5. If the credentials are valid, the session is established.
+6. The session identifier is sent through a secure cookie.
+7. The frontend retrieves the authenticated user's information.
+
+The application shall use generic authentication errors to avoid unnecessarily revealing whether an account exists.
+
+## 11.4 Logout Process
+
+When the user logs out:
+
+1. The frontend sends a logout request.
+2. The backend invalidates the session.
+3. The session cookie is cleared.
+4. The frontend returns the user to the login page.
+
+## 11.5 Authorization
+
+Authentication establishes who the user is.
+
+Authorization determines what the user is allowed to do.
+
+The backend shall enforce ownership rules for:
+
+- Editing posts.
+- Deleting posts.
+- Editing comments.
+- Deleting comments.
+- Updating profiles.
+- Removing likes.
+- Removing follow relationships.
+
+The server shall derive the current user's identity from the authenticated session rather than trusting a user ID supplied in the request body.
+
+---
+
+# 12. SECURITY REQUIREMENTS
+
+## 12.1 Password Security
+
+Passwords shall be hashed using bcrypt or bcryptjs.
+
+Plain-text passwords shall never be stored in MongoDB.
+
+Password hashes shall not be included in API responses or application logs.
+
+## 12.2 Input Validation
+
+All incoming requests shall be validated on the backend.
+
+Validation shall cover:
+
+- Required fields.
+- String lengths.
+- Email formats.
+- Username formats.
+- Password requirements.
+- MongoDB ObjectId formats.
+- Post content.
+- Comment content.
+- Pagination parameters.
+
+Frontend validation will improve usability but will not replace backend validation.
+
+## 12.3 NoSQL Injection Prevention
+
+The backend shall not pass untrusted request objects directly into MongoDB query filters.
+
+It shall construct database filters from validated values and use strict input validation.
+
+The application shall avoid accepting arbitrary MongoDB operators from user-controlled input.
+
+## 12.4 Cross-Site Scripting Prevention
+
+User-generated posts, comments, usernames, and biographies shall be displayed safely.
+
+The frontend should use DOM APIs such as `textContent` when rendering untrusted text.
+
+It shall not treat user-generated text as trusted HTML.
+
+## 12.5 Session Security
+
+The session configuration shall include:
+
+- `HttpOnly` cookies.
+- `Secure` cookies in HTTPS production environments.
+- An appropriate `SameSite` policy.
+- Session expiration.
+- Session identifier regeneration after authentication.
+- Persistent server-side session storage.
+- Session invalidation during logout.
+
+## 12.6 CSRF Protection
+
+Because the application uses cookie-based authentication, state-changing requests must be protected against cross-site request forgery.
+
+The implementation shall use an appropriate CSRF protection strategy and validate the origin of requests where applicable.
+
+## 12.7 Rate Limiting
+
+Rate limiting shall be applied to sensitive endpoints, especially:
+
+- Login.
+- Registration.
+- User search.
+- Post creation.
+- Comment creation.
+
+The exact limits will be configured during implementation.
+
+## 12.8 Security Headers
+
+Helmet will be used to configure appropriate HTTP security headers.
+
+## 12.9 Environment Variables
+
+Sensitive configuration values shall be stored in environment variables.
+
+Examples include:
+
+- `PORT`
+- `MONGODB_URI`
+- `SESSION_SECRET`
+- `NODE_ENV`
+
+The `.env` file shall not be committed to GitHub.
+
+A `.env.example` file shall document the required variable names without containing actual secrets.
+
+## 12.10 Authorization Checks
+
+The backend must verify resource ownership before modifying or deleting records.
+
+A frontend button being hidden does not constitute an authorization control.
+
+## 12.11 Production Security
+
+The deployed application shall use HTTPS.
+
+Database credentials shall be protected.
+
+CORS shall be restricted to trusted origins when cross-origin requests are required.
+
+Production errors shall not reveal internal details.
+
+---
+
+# 13. BUSINESS RULES
+
+The application shall enforce the following business rules.
+
+## 13.1 User Rules
+
+1. Each account must have a unique username.
+2. Each account must have a unique email address.
+3. Passwords must be stored as hashes.
+4. Users may update only their own profiles.
+5. Usernames shall follow a defined format.
+6. Public profile responses shall exclude password hashes and private session information.
+
+## 13.2 Post Rules
+
+1. Only authenticated users may create posts.
+2. Every post must have an author.
+3. Post content cannot be empty.
+4. Post content cannot exceed the configured maximum length.
+5. Only the author may edit or delete a post.
+6. Deleted posts must not remain accessible through ordinary post retrieval endpoints.
+
+## 13.3 Comment Rules
+
+1. Only authenticated users may comment.
+2. Every comment must reference an existing post.
+3. Every comment must have an author.
+4. Comment content cannot be empty.
+5. Only the comment author may edit or delete the comment.
+6. Deleting a post must remove its associated comments.
+
+## 13.4 Like Rules
+
+1. Only authenticated users may like posts.
+2. A user may like a particular post only once.
+3. A user may remove their own like.
+4. A user may not remove another user's like.
+5. Deleting a post must remove its associated likes.
+
+## 13.5 Follow Rules
+
+1. Only authenticated users may follow other users.
+2. Users cannot follow themselves.
+3. Duplicate follow relationships are prohibited.
+4. A user may unfollow an account they currently follow.
+5. A user cannot remove another user's follow relationship.
+6. Follower counts shall reflect actual follow relationships.
+
+## 13.6 Feed Rules
+
+1. Posts shall initially be ordered from newest to oldest.
+2. Deleted posts shall not appear in the feed.
+3. Feed retrieval shall support pagination.
+4. Each post shall include sufficient information to display its author and interaction counts.
+5. The feed shall not expose sensitive account information.
+
+---
+
+# 14. CORE USER WORKFLOWS
+
+## 14.1 Registration Workflow
+
+1. A visitor opens the registration page.
+2. The visitor enters the required information.
+3. The frontend validates the form.
+4. The form is submitted to the backend.
+5. The backend validates the request.
+6. The backend checks for duplicate usernames and email addresses.
+7. The password is hashed.
+8. The user document is created.
+9. The server returns a success response.
+10. The visitor is directed to the login page.
+
+## 14.2 Login Workflow
+
+1. The user opens the login page.
+2. The user submits their credentials.
+3. The backend verifies the credentials.
+4. The server establishes the session.
+5. The frontend retrieves the current user.
+6. The user is redirected to the home feed.
+
+## 14.3 Create Post Workflow
+
+1. The authenticated user opens the home feed.
+2. The user enters text.
+3. The user selects Publish.
+4. The frontend validates the input.
+5. The backend verifies authentication.
+6. The backend validates the post.
+7. The post is saved in MongoDB.
+8. The server returns the new post.
+9. The frontend inserts the post into the feed.
+
+## 14.4 Like Post Workflow
+
+1. The user selects Like.
+2. The frontend sends a request to the backend.
+3. The backend verifies authentication.
+4. The backend verifies that the post exists.
+5. The backend creates the like relationship if it does not already exist.
+6. The backend returns the result.
+7. The frontend updates the like state and count.
+
+If the user has already liked the post, the backend shall prevent the creation of a duplicate relationship.
+
+## 14.5 Comment Workflow
+
+1. The user opens the comments section.
+2. The user enters a comment.
+3. The frontend validates the comment.
+4. The backend verifies authentication.
+5. The backend confirms that the post exists.
+6. The comment is saved.
+7. The backend returns the new comment.
+8. The frontend displays the comment.
+
+## 14.6 Follow Workflow
+
+1. The user opens another user's profile.
+2. The user selects Follow.
+3. The frontend sends a follow request.
+4. The backend verifies authentication.
+5. The backend prevents self-following.
+6. The backend checks for an existing relationship.
+7. The follow relationship is saved.
+8. The frontend updates the follow button and follower count.
+
+## 14.7 Profile Workflow
+
+1. The user opens a profile.
+2. The frontend requests the public profile.
+3. The backend retrieves the user.
+4. The backend retrieves the user's posts.
+5. The backend calculates follower and following counts.
+6. The backend returns the profile information.
+7. The frontend renders the profile.
+
+## 14.8 Delete Post Workflow
+
+1. The post owner selects Delete.
+2. The frontend may request confirmation.
+3. The backend verifies authentication.
+4. The backend verifies post ownership.
+5. The backend deletes the post and associated comments and likes.
+6. The frontend removes the post from the feed.
+
+If the current user does not own the post, the server shall reject the operation.
+
+---
+
+# 15. PROJECT DIRECTORY AND CONFIGURATION
+
+## 15.1 Root Directory
+
+The project will use the following high-level structure:
+
+    social-media-platform/
+    |
+    |-- backend/
+    |-- frontend/
+    |-- .gitignore
+    |-- README.md
+
+## 15.2 Backend Package Configuration
+
+The backend will use ES modules.
+
+The package configuration shall specify the module type as `module`.
+
+This allows the project to use `import` and `export` rather than CommonJS `require`.
+
+## 15.3 Environment Configuration
+
+The backend environment file will define the following variables:
+
+    PORT=5000
+    MONGODB_URI=mongodb://127.0.0.1:27017/social_media_platform
+    SESSION_SECRET=replace_with_a_secure_random_secret
+    NODE_ENV=development
+
+The MongoDB connection string is an example for a local MongoDB server.
+
+If MongoDB is hosted remotely, the connection string shall be updated accordingly.
+
+The session secret must be replaced with a securely generated value.
+
+## 15.4 Database Connection
+
+The backend shall connect to MongoDB before accepting application requests.
+
+If the database connection fails during startup, the server should report the error and exit rather than operating as though database functionality were available.
+
+## 15.5 Health Check
+
+The backend shall provide a health-check endpoint.
+
+Proposed endpoint:
+
+`GET /api/health`
+
+The endpoint shall report whether the application is running.
+
+The health-check design may also report database readiness, allowing deployment monitoring to detect database connection failures.
+
+It must not expose credentials or other sensitive configuration values.
+
+---
+
+# 16. TESTING STRATEGY
+
+Testing will be conducted throughout development rather than postponed until the end.
+
+## 16.1 Unit Testing
+
+Unit tests will verify individual pieces of application logic.
+
+Examples include:
+
+- Input validation.
+- Password verification.
+- Username normalization.
+- Post ownership checks.
+- Follow relationship rules.
+
+## 16.2 API Testing
+
+API endpoints will be tested using Postman or Bruno.
+
+Testing shall cover:
+
+- Valid requests.
+- Invalid requests.
+- Missing required fields.
+- Invalid identifiers.
+- Unauthorized requests.
+- Duplicate relationships.
+- Missing resources.
+- Database failures.
+
+## 16.3 Integration Testing
+
+Integration tests will verify that multiple components work together.
+
+Examples include:
+
+- Registration with MongoDB persistence.
+- Login and session creation.
+- Post creation and retrieval.
+- Comment creation and retrieval.
+- Like creation and removal.
+- Follow creation and removal.
+
+## 16.4 Frontend Testing
+
+The frontend shall be tested for:
+
+- Form validation.
+- Successful API responses.
+- Error handling.
+- Loading indicators.
+- Empty states.
+- Session expiration.
+- Responsive layouts.
+- Safe rendering of user-generated content.
+
+## 16.5 Security Testing
+
+Security testing shall verify that:
+
+- Passwords are not stored in plain text.
+- Unauthenticated users cannot perform protected actions.
+- Users cannot delete other users' posts.
+- Users cannot modify other users' comments.
+- Duplicate likes are prevented.
+- Duplicate follows are prevented.
+- Self-following is rejected.
+- Invalid database identifiers are handled safely.
+- Malicious query input cannot alter database queries.
+- Session cookies use appropriate security settings.
+
+## 16.6 Acceptance Testing
+
+The MVP shall be considered acceptable when a user can:
+
+1. Register an account.
+2. Log in.
+3. View the home feed.
+4. Create a post.
+5. View posts created by other users.
+6. Like and unlike posts.
+7. Comment on posts.
+8. View a user profile.
+9. Follow and unfollow users.
+10. Search for users.
+11. Edit their own profile.
+12. Edit and delete their own posts and comments.
+13. Log out.
+14. Use the interface on desktop and mobile devices.
+
+The application must also prevent unauthorized modifications.
+
+---
+
+# 17. DEVELOPMENT ROADMAP
+
+Development will proceed in clearly defined phases.
+
+## Phase 1: Project Initialization
+
+Tasks:
+
+- Create the project directory.
+- Initialize Git.
+- Initialize the Express application.
+- Configure ES modules.
+- Install essential dependencies.
+- Configure environment variables.
+- Connect to MongoDB.
+- Create the health endpoint.
+
+Deliverable: A working Express application connected to MongoDB.
+
+## Phase 2: Database Models
+
+Tasks:
+
+- Create the User model.
+- Create the Post model.
+- Create the Comment model.
+- Create the Like model.
+- Create the Follow model.
+- Define validation rules.
+- Configure indexes.
+- Test database operations.
+
+Deliverable: A functioning database structure.
+
+## Phase 3: Authentication
+
+Tasks:
+
+- Implement registration.
+- Hash passwords.
+- Implement login.
+- Configure MongoDB-backed sessions.
+- Implement logout.
+- Implement the current-user endpoint.
+- Protect private routes.
+
+Deliverable: A working authentication system.
+
+## Phase 4: User Profiles
+
+Tasks:
+
+- Retrieve public profiles.
+- Update profile information.
+- Display posts.
+- Display follower and following counts.
+- Enforce profile ownership.
+
+Deliverable: Functional user profiles.
+
+## Phase 5: Posts and Feed
+
+Tasks:
+
+- Create posts.
+- Retrieve posts.
+- Edit posts.
+- Delete posts.
+- Implement pagination.
+- Display chronological feeds.
+
+Deliverable: A working social feed.
+
+## Phase 6: Comments and Likes
+
+Tasks:
+
+- Create comments.
+- Retrieve comments.
+- Edit comments.
+- Delete comments.
+- Like posts.
+- Unlike posts.
+- Display interaction counts.
+
+Deliverable: Functional post interactions.
+
+## Phase 7: Following System
+
+Tasks:
+
+- Follow users.
+- Unfollow users.
+- Retrieve followers.
+- Retrieve followed users.
+- Display follow counts.
+- Enforce relationship constraints.
+
+Deliverable: A working following system.
+
+## Phase 8: Frontend Integration
+
+Tasks:
+
+- Create the registration page.
+- Create the login page.
+- Implement the home feed.
+- Build post cards.
+- Implement comments.
+- Implement likes.
+- Build user profiles.
+- Implement follow buttons.
+- Build the explore page.
+- Apply responsive styling.
+
+Deliverable: A fully integrated web application.
+
+## Phase 9: Testing and Refinement
+
+Tasks:
+
+- Test API endpoints.
+- Test authentication.
+- Test authorization.
+- Test database relationships.
+- Test error handling.
+- Test responsive layouts.
+- Fix discovered bugs.
+
+Deliverable: A stable MVP.
+
+## Phase 10: Deployment
+
+Tasks:
+
+- Select hosting providers.
+- Configure the production MongoDB database.
+- Configure environment variables.
+- Deploy the backend.
+- Deploy or serve the frontend.
+- Configure HTTPS.
+- Verify production authentication.
+- Test all major workflows.
+- Document deployment instructions.
+
+Deliverable: An accessible production deployment.
+
+---
+
+# 18. DEPLOYMENT STRATEGY
+
+## 18.1 Development Environment
+
+During development, the application will run locally.
+
+The frontend will communicate with the local Express server.
+
+MongoDB may run locally or in a Docker container.
+
+The local environment shall use separate development credentials and configuration.
+
+## 18.2 Production Environment
+
+The production environment will require:
+
+- A Node.js hosting service.
+- A MongoDB database accessible to the backend.
+- Secure environment variables.
+- HTTPS.
+- Persistent session storage.
+- A configured production start command.
+
+MongoDB Atlas is one possible option for managed MongoDB hosting.
+
+The frontend may be served directly by Express or hosted separately as a static website.
+
+Serving the frontend through Express is a straightforward MVP option because it can reduce cross-origin configuration requirements.
+
+If the frontend and backend are deployed on different origins, the application must configure CORS, cookies, and credentials appropriately.
+
+## 18.3 Production Verification
+
+After deployment, the following must be verified:
+
+- The API health endpoint works.
+- MongoDB connections succeed.
+- Registration works.
+- Login works.
+- Session persistence works.
+- Post creation works.
+- Comments and likes work.
+- Following works.
+- Authorization checks remain effective.
+- Logout invalidates the session.
+
+The deployment shall not be considered complete until the main user workflows have been tested.
+
+---
+
+# 19. FUTURE ENHANCEMENTS
+
+The following features are outside the initial MVP scope but may be added in later versions.
+
+## 19.1 Profile Pictures
+
+Users will be able to upload profile pictures.
+
+This will require file validation and a suitable storage solution.
+
+## 19.2 Image Posts
+
+Users will be able to attach images to posts.
+
+The system will require image validation, upload limits, and media storage.
+
+## 19.3 Notifications
+
+Users may receive notifications when other users like their posts, comment on their content, or follow them.
+
+Notifications can initially be implemented through a dedicated MongoDB collection and retrieved through API endpoints.
+
+Real-time delivery can be introduced later if necessary.
+
+## 19.4 Personalized Feed
+
+The feed can be modified to prioritize content from accounts followed by the current user.
+
+The application may also support a separate global feed.
+
+## 19.5 Saved Posts
+
+Users may save posts for later viewing.
+
+This feature would require an additional collection or a suitable user-to-post relationship.
+
+## 19.6 Dark Mode
+
+The interface may support a dark theme.
+
+## 19.7 Administrative Tools
+
+An administrative interface may be introduced to support moderation and account management.
+
+## 19.8 Content Reporting
+
+Users may report inappropriate content.
+
+This would require reporting records, moderation workflows, and suitable access controls.
+
+## 19.9 Post Pagination Improvements
+
+The application may adopt cursor-based pagination for improved feed performance as the number of posts increases.
+
+## 19.10 Account Recovery
+
+Email verification and password reset functionality may be introduced after the initial authentication system is stable.
+
+---
+
+# 20. PROJECT RISKS AND MITIGATION
+
+## 20.1 Duplicate Likes and Follows
+
+**Risk:** Multiple requests may create duplicate relationship records.
+
+**Mitigation:** Use compound unique indexes and handle duplicate-key errors appropriately.
+
+## 20.2 Unauthorized Resource Modification
+
+**Risk:** Users may attempt to modify other users' posts or comments.
+
+**Mitigation:** Enforce authentication and ownership checks in the backend.
+
+## 20.3 Database Performance
+
+**Risk:** Large feeds and relationship queries may become slow.
+
+**Mitigation:** Use indexes, pagination, projections, and efficient queries.
+
+## 20.4 Authentication Vulnerabilities
+
+**Risk:** Poor session configuration may expose authenticated accounts.
+
+**Mitigation:** Use secure cookies, persistent session storage, HTTPS, appropriate session expiration, CSRF protection, and session invalidation.
+
+## 20.5 Malicious User Input
+
+**Risk:** Malicious input may cause security vulnerabilities or unexpected application behaviour.
+
+**Mitigation:** Validate requests, construct safe database queries, and render untrusted content as text.
+
+## 20.6 Incomplete Data Cleanup
+
+**Risk:** Deleted posts or accounts may leave orphaned comments, likes, or follow relationships.
+
+**Mitigation:** Implement explicit cleanup logic and test deletion workflows.
+
+## 20.7 Scope Expansion
+
+**Risk:** Adding advanced features too early may delay the MVP.
+
+**Mitigation:** Prioritize the defined requirements and postpone optional enhancements.
+
+## 20.8 Deployment Configuration Errors
+
+**Risk:** Incorrect environment variables, database permissions, or cookie settings may cause production failures.
+
+**Mitigation:** Use documented configuration, separate development and production settings, and verify the application after deployment.
+
+---
+
+# 21. PROJECT SUCCESS CRITERIA
+
+The project will be considered successful when the following conditions are satisfied:
+
+1. Users can register and authenticate securely.
+2. Users can create and manage their profiles.
+3. Authenticated users can publish posts.
+4. The feed displays recent posts correctly.
+5. Users can comment on posts.
+6. Users can like and unlike posts.
+7. Users can follow and unfollow other accounts.
+8. Profiles display accurate follower and following counts.
+9. Users can search for other users.
+10. Unauthorized modifications are rejected.
+11. Data persists correctly in MongoDB.
+12. The application handles invalid requests gracefully.
+13. The frontend works on desktop and mobile devices.
+14. The core application workflows pass testing.
+15. The application can be deployed and configured without exposing secrets.
+
+---
+
+# 22. FINAL SYSTEM SUMMARY
+
+The Social Media Platform will be a lightweight, full-stack web application designed to demonstrate the core functionality of a social networking system.
+
+The frontend will use HTML5, CSS3, and vanilla JavaScript.
+
+The backend will use Node.js and Express.js.
+
+MongoDB will provide persistent storage, while Mongoose will manage document schemas, validation, indexes, and database operations.
+
+The system will use RESTful APIs to support user authentication, profile management, posts, comments, likes, follows, and user discovery.
+
+The initial implementation will prioritize functionality, security, maintainability, and a straightforward user experience.
+
+The application will follow a modular monolithic architecture, with separate components for routes, controllers, services, models, middleware, and frontend logic.
+
+Development will begin with the project foundation and database models, proceed through authentication and social features, and conclude with integration, testing, and deployment.
+
+Advanced functionality will be introduced only after the core application is stable.
+
+**The immediate next milestone is to initialize the project, establish the Express.js and MongoDB connection, and create the initial application structure.**
