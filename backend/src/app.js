@@ -21,7 +21,9 @@ export function createApp() {
     app.use('/static', express.static(FRONTEND_DIR));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    app.use(createSessionMiddleware());
+    const sessionMiddleware = createSessionMiddleware();
+    app.use(sessionMiddleware);
+    app.locals.sessionStore = sessionMiddleware.store;
 
     app.get('/api/health', (req, res) => {
         res.status(200).json({

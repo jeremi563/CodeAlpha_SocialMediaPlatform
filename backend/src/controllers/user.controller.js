@@ -10,7 +10,7 @@ import * as followService from "../services/follow.service.js";
  */
 function toPublicUser(doc) {
   if (!doc) return null;
-  const { _id, passwordHash, __v, ...rest } = doc;
+  const { _id, passwordHash, email, __v, ...rest } = doc;
   return { id: _id.toString(), ...rest };
 }
 

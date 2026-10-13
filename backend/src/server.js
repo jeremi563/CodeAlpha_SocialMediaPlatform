@@ -11,11 +11,12 @@ import {connectDatabase} from './config/database.js';
 
 const PORT = process.env.PORT || 5000;
 let server;
+let app;
 
 async function startServer() {
     await connectDatabase();
 
-    const app = createApp();
+    app = createApp();
     server = app.listen(PORT, () => {
         console.log(`[server] Server is running on port ${PORT}`);
     });
@@ -27,6 +28,7 @@ console.log(`[server] Health check: http://localhost:${PORT}/api/health`);
 const shutdown = async (signal) => {
     console.log(`\n[server] Received ${signal}. Shutting down gracefully...`);
     server.close(async () => {
+      await app.locals.sessionStore.close();
       const { disconnectDatabase } = await import("./config/database.js");
       await disconnectDatabase();
       process.exit(0);
