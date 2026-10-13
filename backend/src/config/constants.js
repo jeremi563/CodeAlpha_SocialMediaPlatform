@@ -1,0 +1,18 @@
+export const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/;
+
+export const LIMITS = {
+    FULL_NAME_MAX: 80,
+    USERNAME_MIN:3,
+    USERNAME_MAX:20,
+    BIO_MAX: 160,
+    PASSWORD_MIN: 8,
+    PASSWORD_MAX: 72,
+    POST_CONTENT_MAX: 2000,
+    COMMENT_CONTENT_MAX: 1000,
+}
+
+export const PAGINATION = {
+    DEFAULT_PAGE:1,
+    DEFAULT_LIMIT:10,
+    MAX_LIMIT:50,
+}
