@@ -1,80 +1,79 @@
 # Social Media Platform
 
-A lightweight, full-stack social media web application built with a vanilla HTML/CSS/JavaScript frontend, Express API, and MongoDB.
+A social media MVP built with a vanilla HTML/CSS/JavaScript frontend, a Node.js and Express REST API, and MongoDB. Express serves the frontend and API from the same service.
 
----
+## Features
 
-## ✨ Features
+- Registration, login, logout, and MongoDB-backed sessions.
+- Public profiles, profile editing, username search, and discovery.
+- Chronological paginated post feed with owner-only editing and deletion.
+- Comments, likes, follows, and follower/following lists.
+- Responsive frontend with SVG icons and accessible interaction states.
 
-- **User Profiles:** Create an account, manage personal bios, and view other users' profiles and activity.
-- **Posts & Comments:** Share updates, thoughts, or media, and engage in conversations via post comments.
-- **Like System:** Like and unlike posts to show appreciation for content.
-- **Follow System:** Follow and unfollow other users to curate a personalized feed.
+## Technology
 
----
+- Frontend: HTML5, CSS3, vanilla JavaScript.
+- Backend: Node.js, Express, Mongoose, and `express-validator`.
+- Database and sessions: MongoDB, Mongoose, and `connect-mongo`.
+- Tests: Node's built-in test runner (`node:test`).
 
-## 🛠️ Tech Stack
-
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript
-- **Backend:** Node.js and Express.js
-- **Database:** MongoDB with Mongoose
-
----
-
-## 🚀 Getting Started
-
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
-
-### Prerequisites
-
-Make sure you have the following installed on your system:
-- **Node.js** (v16+) & **npm** *(if using Express.js)* **OR** **Python** (v3.10+) & **pip** *(if using Django)*
-- Git
-
-### Installation
-
-1. **Install backend dependencies:**
-   ```bash
-  cd backend
-  npm install
-   ```
-
-2. **Configure the environment:** create `backend/.env` using `backend/.env.example` and set a MongoDB URI and session secret.
-
-3. **Start the integrated application:**
-  ```bash
-  npm start
-  ```
-  For development with automatic restarts, run `npm run dev` instead. Both commands start the API and serve the frontend from the same Express process.
-
-4. Open `http://localhost:5000` (or the configured `PORT`). The login, registration, feed, explore, and profile pages are served by the backend.
-
----
-
-## 📂 Project Structure
+## Repository Layout
 
 ```text
-social-media-platform/
-│
-├── frontend/          # HTML, CSS, and client-side JavaScript
-├── backend/           # Server-side logic (Django or Express)
-└── README.md          # Project documentation
+.
+├── backend/
+│   ├── scripts/          # Manual model and validation checks
+│   ├── src/              # Express app, API modules, and configuration
+│   ├── tests/            # API regression tests
+│   ├── request.rest      # REST Client examples (may be git-ignored locally)
+│   └── package.json
+├── frontend/
+│   ├── assets/
+│   ├── css/
+│   ├── js/
+│   └── *.html
+├── project documentation.txt  # Full system specification; retained
+├── RENDER_DEPLOYMENT.md       # Render and MongoDB Atlas deployment guide
+└── README.md
 ```
 
----
+## Run Locally
 
-## 🤝 Contributing
+Prerequisites: Node.js 22 and npm, plus a reachable MongoDB deployment.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. Install backend dependencies:
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git origin push feature/AmazingFeature`)
-5. Open a Pull Request
+  ```sh
+  cd backend
+  npm ci
+  ```
 
----
+2. Create `backend/.env` using `backend/.env.example`. Set `MONGODB_URI` to a valid MongoDB connection string and replace `SESSION_SECRET` with a long random value. Keep `.env` private and untracked.
 
-## 📄 License
+3. Start the integrated app from the `backend/` directory:
 
-Distributed under the MIT License. See `LICENSE` for more information.
+  ```sh
+  npm start
+  ```
+
+  For development with automatic restarts, use `npm run dev`.
+
+4. Open `http://localhost:5000`. The configured `PORT` is used when present. The API health endpoint is `http://localhost:5000/api/health`.
+
+## Tests
+
+Run the focused API regression suite from `backend/`:
+
+```sh
+npm test
+```
+
+The suite uses the configured MongoDB connection, creates a temporary user, and removes it after the run. Do not point it at a production database.
+
+## Deployment
+
+See [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md) for Render Web Service settings, Atlas configuration, environment variables, verification steps, and troubleshooting.
+
+## Project Specification
+
+The original system design, requirements, data model, API specification, and roadmap are preserved in [project documentation.txt](project%20documentation.txt). This README summarizes the implementation and does not replace that document.
