@@ -246,94 +246,144 @@ POST {{baseUrl}}/api/auth/logout
 
 ### ---- Phase 4/5: User Profiles & Posts ----
 
-# ### 6.1 Get public profile by username
-# GET {{baseUrl}}/api/users/johnmwangi
-#
-# ### 6.2 Update my profile (auth required)
-# PATCH {{baseUrl}}/api/users/me
-# Content-Type: {{contentType}}
-#
-# {
-#   "fullName": "John M. Mwangi",
-#   "bio": "Software developer and technology enthusiast."
-# }
-#
-# ### 6.3 Get posts by user
-# GET {{baseUrl}}/api/users/johnmwangi/posts?page=1&limit=10
-#
-# ### 6.4 Search users
-# GET {{baseUrl}}/api/users/search?q=ali
-#
-# ### 6.5 Get followers
-# GET {{baseUrl}}/api/users/johnmwangi/followers
-#
-# ### 6.6 Get following
-# GET {{baseUrl}}/api/users/johnmwangi/following
+### 6.1 Get public profile by username
+GET {{baseUrl}}/api/users/johnmwangi
+
+### 6.2 Update my profile (auth required)
+PATCH {{baseUrl}}/api/users/me
+Content-Type: {{contentType}}
+
+{
+  "fullName": "John M. Mwangi",
+  "bio": "Software developer and technology enthusiast."
+}
+
+### 6.3 Get posts by user
+GET {{baseUrl}}/api/users/johnmwangi/posts?page=1&limit=10
+
+### 6.4 Search users
+GET {{baseUrl}}/api/users/search?q=ali
+
+### 6.5 Get followers
+GET {{baseUrl}}/api/users/johnmwangi/followers
+
+### 6.6 Get following
+GET {{baseUrl}}/api/users/johnmwangi/following
 
 
 ### ---- Phase 5: Posts ----
 
-# ### 6.7 Create a post
-# POST {{baseUrl}}/api/posts
-# Content-Type: {{contentType}}
-#
-# {
-#   "content": "Today I started building my social media platform."
-# }
-#
-# ### 6.8 Get main feed
-# GET {{baseUrl}}/api/posts?page=1&limit=10
-#
-# ### 6.9 Get single post by id
-# GET {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID
-#
-# ### 6.10 Edit a post
-# PATCH {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID
-# Content-Type: {{contentType}}
-#
-# {
-#   "content": "Updated post content."
-# }
-#
-# ### 6.11 Delete a post
-# DELETE {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID
+### 6.7 Create a post
+POST {{baseUrl}}/api/posts
+Content-Type: {{contentType}}
+
+{
+  "content": "Today I started building my social media platform."
+}
+
+### 6.8 Get main feed
+GET {{baseUrl}}/api/posts?page=1&limit=10
+
+### 6.9 Get single post by id
+GET {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID
+
+### 6.10 Edit a post
+PATCH {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID
+Content-Type: {{contentType}}
+
+{
+  "content": "Updated post content."
+}
+
+### 6.11 Delete a post
+DELETE {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID
 
 
 ### ---- Phase 6: Comments & Likes ----
 
-# ### 6.12 Add a comment
-# POST {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID/comments
-# Content-Type: {{contentType}}
-#
-# {
-#   "content": "Great work on the project!"
-# }
-#
-# ### 6.13 Get comments for a post
-# GET {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID/comments
-#
-# ### 6.14 Edit a comment
-# PATCH {{baseUrl}}/api/comments/REPLACE_WITH_COMMENT_ID
-# Content-Type: {{contentType}}
-#
-# {
-#   "content": "Updated comment."
-# }
-#
-# ### 6.15 Delete a comment
-# DELETE {{baseUrl}}/api/comments/REPLACE_WITH_COMMENT_ID
-#
-# ### 6.16 Like a post
-# POST {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID/likes
-#
-# ### 6.17 Unlike a post
-# DELETE {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID/likes
+### 6.12 Register a comment/like test user A
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "fullName": "Phase6 User A",
+  "username": "phase6usera",
+  "email": "phase6usera@example.com",
+  "password": "StrongPass123"
+}
+
+### 6.13 Register a comment/like test user B
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "fullName": "Phase6 User B",
+  "username": "phase6userb",
+  "email": "phase6userb@example.com",
+  "password": "StrongPass456"
+}
+
+### 6.14 Login as user A
+# @name phase6LoginA
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "identifier": "phase6usera",
+  "password": "StrongPass123"
+}
+
+### 6.15 Login as user B
+# @name phase6LoginB
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "identifier": "phase6userb",
+  "password": "StrongPass456"
+}
+
+### 6.16 Create a post to test comments and likes
+POST {{baseUrl}}/api/posts
+Content-Type: {{contentType}}
+
+{
+  "content": "Phase 6 test post for comments and likes."
+}
+
+### 6.17 Add a comment to the post
+POST {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID/comments
+Content-Type: {{contentType}}
+
+{
+  "content": "Great work on the project!"
+}
+
+### 6.18 Get comments for a post
+GET {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID/comments?page=1&limit=10
+
+### 6.19 Edit a comment you own
+PATCH {{baseUrl}}/api/comments/REPLACE_WITH_COMMENT_ID
+Content-Type: {{contentType}}
+
+{
+  "content": "Updated comment by the owner."
+}
+
+### 6.20 Delete a comment you own
+DELETE {{baseUrl}}/api/comments/REPLACE_WITH_COMMENT_ID
+
+### 6.21 Like a post
+POST {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID/likes
+
+### 6.22 Unlike a post
+DELETE {{baseUrl}}/api/posts/REPLACE_WITH_POST_ID/likes
 
 
 ### ---- Phase 7: Follows ----
 
-# ### 6.18 Follow a user
-# POST {{baseUrl}}/api/users/REPLACE_WITH_USER_ID/follow
-#
-# ### 6.19 Unfollow a user
-# DELETE {{baseUrl}}/api/users/REPLACE_WITH_USER_ID/follow
+### 6.18 Follow a user
+POST {{baseUrl}}/api/users/REPLACE_WITH_USER_ID/follow
+
+### 6.19 Unfollow a user
+DELETE {{baseUrl}}/api/users/REPLACE_WITH_USER_ID/follow

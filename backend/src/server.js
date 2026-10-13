@@ -1,17 +1,22 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 import {createApp} from './app.js';
 import {connectDatabase} from './config/database.js';
 
-
 const PORT = process.env.PORT || 5000;
+let server;
+
 async function startServer() {
     await connectDatabase();
 
     const app = createApp();
-    
-    const server = app.listen(PORT, () => {
+    server = app.listen(PORT, () => {
         console.log(`[server] Server is running on port ${PORT}`);
     });
 }
@@ -32,4 +37,4 @@ const shutdown = async (signal) => {
     process.on("SIGINT", () => shutdown("SIGINT"));
   process.on("SIGTERM", () => shutdown("SIGTERM"));
 
-  startServer();
+startServer();
