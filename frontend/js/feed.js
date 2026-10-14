@@ -1,5 +1,6 @@
 import { api, escapeHtml, timeAgo, toast } from "/static/js/api.js";
 import { openFormDialog } from "/static/js/dialog.js";
+import { setAvatar } from "/static/js/avatars.js";
 
 let currentUser = null;
 let currentPage = 1;
@@ -87,9 +88,30 @@ async function loadFeed() {
     // Show/hide the Load more button
     const loadMore = document.getElementById("load-more");
     loadMore.style.display = currentPage < totalPages ? "inline-block" : "none";
+    if (currentPage === 1) await focusPostFromQuery();
   } catch (err) {
     container.innerHTML = `<div class="empty-state">Failed to load feed: ${escapeHtml(err.message)}</div>`;
   }
+}
+
+async function focusPostFromQuery() {
+  const postId = new URLSearchParams(window.location.search).get("postId");
+  if (!/^[a-f\d]{24}$/i.test(postId || "")) return;
+
+  let postCard = document.querySelector(`.post[data-post-id="${postId}"]`);
+  if (!postCard) {
+    try {
+      const response = await api.get(`/api/posts/${postId}`);
+      postCard = renderPost(response.data.post);
+      document.getElementById("feed").prepend(postCard);
+    } catch {
+      toast("This post is no longer available.", "error");
+      return;
+    }
+  }
+
+  postCard.classList.add("notification-target");
+  requestAnimationFrame(() => postCard.scrollIntoView({ behavior: "smooth", block: "center" }));
 }
 
 /**
@@ -110,7 +132,7 @@ export function renderPost(post) {
   el.innerHTML = `
     <div class="post-header">
       <div class="post-identity">
-        <div class="avatar avatar-small" aria-hidden="true">${initials(post.author?.fullName || "?")}</div>
+        <div class="avatar avatar-small post-avatar" aria-hidden="true">${initials(post.author?.fullName || "?")}</div>
         <div class="post-author">
         <a class="post-author-name" href="/profile?username=${encodeURIComponent(authorUsername)}">${authorName}</a>
         <span class="post-author-username">@${authorUsername}</span>
@@ -128,6 +150,7 @@ export function renderPost(post) {
     </div>
     <div class="comments-section" data-post-id="${post.id}" hidden></div>
   `;
+  setAvatar(el.querySelector(".post-avatar"), post.author?.fullName, post.author?.avatarUrl);
   return el;
 }
 
@@ -151,7 +174,12 @@ async function onCompose() {
     // (those are computed at read-time). Build a compatible shape.
     const newPost = {
       id: res.data.post.id,
-      author: { id: currentUser.id, fullName: currentUser.fullName, username: currentUser.username },
+      author: {
+        id: currentUser.id,
+        fullName: currentUser.fullName,
+        username: currentUser.username,
+        avatarUrl: currentUser.avatarUrl,
+      },
       content: res.data.post.content,
       createdAt: res.data.post.createdAt,
       updatedAt: res.data.post.updatedAt,

@@ -1,4 +1,5 @@
 import { api, toast } from "/static/js/api.js";
+import { setAvatar } from "/static/js/avatars.js";
 
 let currentUser = null;
 
@@ -93,7 +94,7 @@ async function loadDiscover() {
       row.className = "suggestion";
       const avatar = document.createElement("div");
       avatar.className = "avatar avatar-small";
-      avatar.textContent = String(person.fullName || "?").trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+      setAvatar(avatar, person.fullName, person.avatarUrl);
       const info = document.createElement("div");
       info.className = "suggestion-info";
       const link = document.createElement("a");

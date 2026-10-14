@@ -5,16 +5,17 @@ A social media MVP built with a vanilla HTML/CSS/JavaScript frontend, a Node.js 
 ## Features
 
 - Registration, login, logout, and MongoDB-backed sessions.
-- Public profiles, profile editing, username search, and discovery.
+- Public profiles, profile editing, profile picture upload/removal, username search, and discovery.
 - Chronological paginated post feed with owner-only editing and deletion.
 - Comments, likes, follows, and follower/following lists.
+- A paginated notifications inbox for likes, comments, and new followers, with unread counts and read controls.
 - Responsive frontend with SVG icons and accessible interaction states.
 
 ## Technology
 
 - Frontend: HTML5, CSS3, vanilla JavaScript.
 - Backend: Node.js, Express, Mongoose, and `express-validator`.
-- Database and sessions: MongoDB, Mongoose, and `connect-mongo`.
+- Database, sessions, and persistent profile pictures: MongoDB, Mongoose, `connect-mongo`, and GridFS.
 - Tests: Node's built-in test runner (`node:test`).
 
 ## Repository Layout

@@ -1,6 +1,7 @@
 import { api, escapeHtml, toast } from "/static/js/api.js";
 import { openFormDialog } from "/static/js/dialog.js";
 import { initPostActions, renderPost, setPostCurrentUser } from "/static/js/feed.js";
+import { setAvatar } from "/static/js/avatars.js";
 
 let currentUser = null;
 
@@ -51,7 +52,7 @@ function renderProfile(root, user, stats) {
 
   let actionHtml = "";
   if (isMe) {
-    actionHtml = `<button class="btn btn-secondary" id="edit-profile-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-edit"></use></svg><span>Edit profile</span></button>`;
+    actionHtml = `<button type="button" class="btn btn-secondary" id="change-profile-picture-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-image"></use></svg><span>${user.avatarUrl ? "Change photo" : "Add photo"}</span></button>${user.avatarUrl ? '<button type="button" class="btn btn-secondary btn-danger" id="remove-profile-picture-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-trash"></use></svg><span>Remove photo</span></button>' : ""}<button type="button" class="btn btn-secondary" id="edit-profile-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-edit"></use></svg><span>Edit profile</span></button>`;
   } else if (currentUser) {
     actionHtml = `
       <button type="button" class="btn ${stats.isFollowing ? "btn-secondary following" : "btn-primary"} follow-btn"
@@ -79,9 +80,55 @@ function renderProfile(root, user, stats) {
     </div>
   `;
 
+  setAvatar(root.querySelector(".profile-avatar"), user.fullName, user.avatarUrl);
+
   if (isMe) {
     const editBtn = document.getElementById("edit-profile-btn");
     editBtn.addEventListener("click", () => openEditForm(user));
+    document.getElementById("change-profile-picture-btn").addEventListener("click", () => {
+      document.getElementById("profile-picture-input").click();
+    });
+    document.getElementById("profile-picture-input").addEventListener("change", uploadProfilePicture, { once: true });
+    document.getElementById("remove-profile-picture-btn")?.addEventListener("click", removeProfilePicture);
+  }
+}
+
+async function uploadProfilePicture(event) {
+  const input = event.currentTarget;
+  const file = input.files?.[0];
+  if (!file) return;
+  if (!file.type.match(/^image\/(jpeg|png|webp)$/) || file.size > 5 * 1024 * 1024) {
+    toast("Choose a JPEG, PNG, or WebP image under 5 MB.", "error");
+    input.value = "";
+    input.addEventListener("change", uploadProfilePicture, { once: true });
+    return;
+  }
+
+  const form = new FormData();
+  form.append("profilePicture", file);
+  const button = document.getElementById("change-profile-picture-btn");
+  button.disabled = true;
+  button.querySelector("span").textContent = "Uploading...";
+  try {
+    await api.post("/api/users/me/profile-picture", form);
+    toast("Profile picture updated.", "success");
+    window.location.reload();
+  } catch (error) {
+    toast(error.message || "Could not upload this image.", "error");
+    button.disabled = false;
+    button.querySelector("span").textContent = "Try again";
+    input.value = "";
+    input.addEventListener("change", uploadProfilePicture, { once: true });
+  }
+}
+
+async function removeProfilePicture() {
+  try {
+    await api.delete("/api/users/me/profile-picture");
+    toast("Profile picture removed.", "success");
+    window.location.reload();
+  } catch (error) {
+    toast(error.message || "Could not remove this image.", "error");
   }
 }
 

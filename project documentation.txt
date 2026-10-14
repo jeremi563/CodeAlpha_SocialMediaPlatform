@@ -420,7 +420,7 @@ The MongoDB database will be named:
 
 `social_media_platform`
 
-The database will initially contain five primary collections.
+The database will contain five primary application collections.
 
 - `users`
 - `posts`
@@ -429,6 +429,8 @@ The database will initially contain five primary collections.
 - `follows`
 
 A separate session collection may be created automatically by the configured session store.
+
+Profile pictures are stored in a MongoDB GridFS bucket named `profilePictures`. GridFS uses the `profilePictures.files` and `profilePictures.chunks` collections; user documents store only the current picture's GridFS ObjectId. This keeps image data in persistent MongoDB storage rather than on an ephemeral application filesystem.
 
 ## 5.2 Users Collection
 
@@ -444,6 +446,7 @@ Each document will represent one registered user.
 - `email`: Unique email address.
 - `passwordHash`: Hashed password.
 - `bio`: Short profile description.
+- `profilePictureId`: Optional GridFS ObjectId for the user's normalized profile picture.
 - `createdAt`: Account creation timestamp.
 - `updatedAt`: Last profile update timestamp.
 
@@ -1195,6 +1198,20 @@ Purpose: Retrieve a public profile.
 
 The response shall contain public profile information, post count, follower count, and following count.
 
+When a profile picture exists, the public response may include a versioned `avatarUrl`. It shall not expose the internal GridFS ObjectId or image bytes.
+
+### POST /api/users/me/profile-picture
+
+Purpose: Upload or replace the authenticated user's profile picture.
+
+Authentication: Required. The request uses multipart form data with a `profilePicture` file field. JPEG, PNG, and WebP images up to 5 MB are accepted and normalized to a 512-pixel WebP before storage.
+
+### DELETE /api/users/me/profile-picture
+
+Purpose: Remove the authenticated user's profile picture.
+
+Authentication: Required. The associated GridFS object is deleted.
+
 ### PATCH /api/users/me
 
 Purpose: Update the current user's profile.
@@ -1377,6 +1394,28 @@ Authentication: Required.
 The backend shall remove only the relationship initiated by the current user.
 
 Successful response: HTTP 200 OK or HTTP 204 No Content.
+
+## 9.7 Notification Endpoints
+
+Notifications are stored in a dedicated collection and retrieved when requested. The initial release does not use real-time delivery.
+
+### GET /api/notifications?page=&limit=
+
+Purpose: Retrieve the authenticated user's notifications, newest first.
+
+Authentication: Required. The response includes a paginated notification list and the total unread count. Each notification identifies its actor, event type, creation time, read state, and related post where applicable. It shall not expose private account fields.
+
+### PATCH /api/notifications/:notificationId/read
+
+Purpose: Mark one of the authenticated user's notifications as read.
+
+Authentication: Required. A user may only update notifications addressed to their own account.
+
+### PATCH /api/notifications/read-all
+
+Purpose: Mark all of the authenticated user's unread notifications as read.
+
+Authentication: Required.
 
 ---
 
@@ -2128,9 +2167,7 @@ The following features are outside the initial MVP scope but may be added in lat
 
 ## 19.1 Profile Pictures
 
-Users will be able to upload profile pictures.
-
-This will require file validation and a suitable storage solution.
+**Status: Implemented.** Authenticated users can upload, replace, and remove profile pictures. Uploads are limited to 5 MB, restricted to JPEG, PNG, and WebP, normalized to metadata-free 512-pixel WebP, and stored in MongoDB GridFS. Public profile, feed, comment, search, and discovery data expose versioned avatar URLs without exposing GridFS identifiers. See the profile-picture routes in Section 9.2.
 
 ## 19.2 Image Posts
 
@@ -2140,11 +2177,9 @@ The system will require image validation, upload limits, and media storage.
 
 ## 19.3 Notifications
 
-Users may receive notifications when other users like their posts, comment on their content, or follow them.
+**Status: Implemented.** Users receive persistent notifications when another user likes one of their posts, comments on one of their posts, or follows them. The authenticated inbox is paginated, reports the unread count, supports marking one or all notifications as read, and links post and follow activity to the related content or profile. Self-actions and duplicate idempotent like/follow requests do not create extra notifications.
 
-Notifications can initially be implemented through a dedicated MongoDB collection and retrieved through API endpoints.
-
-Real-time delivery can be introduced later if necessary.
+Notifications are stored in a dedicated MongoDB collection and retrieved through API endpoints. Delivery is request-based; real-time delivery can be introduced later if needed.
 
 ## 19.4 Personalized Feed
 

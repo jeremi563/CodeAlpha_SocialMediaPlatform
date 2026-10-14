@@ -1,6 +1,7 @@
 import { Comment } from "../models/comment.model.js";
 import { Post } from "../models/post.model.js";
 import { PAGINATION } from "../config/constants.js";
+import { createNotificationSafely } from "./notification.service.js";
 
 /**
  * Comment business logic: create, list, edit, delete.
@@ -14,8 +15,8 @@ import { PAGINATION } from "../config/constants.js";
  * Author is derived from session (Section 11.5).
  */
 export async function createComment({ postId, authorId, content }) {
-  const postExists = await Post.exists({ _id: postId });
-  if (!postExists) {
+  const post = await Post.findById(postId).select("author");
+  if (!post) {
     const err = new Error("Post not found.");
     err.status = 404;
     throw err;
@@ -30,6 +31,13 @@ export async function createComment({ postId, authorId, content }) {
   // Populate author info for the response so the frontend can
   // render it without a second fetch.
   await comment.populate("author", "fullName username profilePictureId");
+  await createNotificationSafely({
+    recipientId: post.author,
+    actorId: authorId,
+    type: "comment",
+    postId,
+    commentId: comment._id,
+  });
 
   return comment;
 }

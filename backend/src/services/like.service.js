@@ -1,5 +1,6 @@
 import { Like } from "../models/like.model.js";
 import { Post } from "../models/post.model.js";
+import { createNotificationSafely } from "./notification.service.js";
 
 /**
  * Like business logic: like, unlike.
@@ -13,8 +14,8 @@ import { Post } from "../models/post.model.js";
  * Section 13.4 rules 19-20.
  */
 export async function likePost(postId, userId) {
-  const postExists = await Post.exists({ _id: postId });
-  if (!postExists) {
+  const post = await Post.findById(postId).select("author");
+  if (!post) {
     const err = new Error("Post not found.");
     err.status = 404;
     throw err;
@@ -22,6 +23,12 @@ export async function likePost(postId, userId) {
 
   try {
     await Like.create({ user: userId, post: postId });
+    await createNotificationSafely({
+      recipientId: post.author,
+      actorId: userId,
+      type: "like",
+      postId,
+    });
     return { created: true };
   } catch (err) {
     if (err.code === 11000) {

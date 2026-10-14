@@ -16,6 +16,7 @@
       <nav aria-label="Main navigation">
         <a href="/"><svg class="icon"><use href="/static/assets/icons.svg#i-home"></use></svg><span>Home</span></a>
         <a href="/explore" class="active"><svg class="icon"><use href="/static/assets/icons.svg#i-compass"></use></svg><span>Explore</span></a>
+        <a href="/notifications"><svg class="icon"><use href="/static/assets/icons.svg#i-bell"></use></svg><span>Notifications</span><span class="notification-badge" hidden></span></a>
         <a href="/profile" id="my-profile-link"><svg class="icon"><use href="/static/assets/icons.svg#i-user"></use></svg><span>My profile</span></a>
         <div class="nav-divider"></div><p class="nav-caption">Your space</p>
         <a href="#" id="logout-link"><svg class="icon"><use href="/static/assets/icons.svg#i-log-out"></use></svg><span>Log out</span></a>
@@ -49,5 +50,6 @@
     initFollows();
     await initExplore();
   </script>
+  <script type="module" src="/static/js/notification-badge.js"></script>
 </body>
 </html>

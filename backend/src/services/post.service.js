@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Post } from "../models/post.model.js";
 import { Comment } from "../models/comment.model.js";
 import { Like } from "../models/like.model.js";
+import { Notification } from "../models/notification.model.js";
 import { PAGINATION } from "../config/constants.js";
 
 /**
@@ -104,6 +105,7 @@ export async function deletePost(postId, userId) {
   await Promise.all([
     Comment.deleteMany({ post: post._id }),
     Like.deleteMany({ post: post._id }),
+    Notification.deleteMany({ post: post._id }),
   ]);
 
   await Post.deleteOne({ _id: post._id });

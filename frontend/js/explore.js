@@ -1,4 +1,5 @@
 import { api } from "/static/js/api.js";
+import { setAvatar } from "/static/js/avatars.js";
 
 export async function initExplore() {
 	let user;
@@ -16,7 +17,7 @@ export async function initExplore() {
 	account.hidden = false;
 	const avatar = document.createElement("div");
 	avatar.className = "avatar avatar-small";
-	avatar.textContent = initials(user.fullName);
+	setAvatar(avatar, user.fullName, user.avatarUrl);
 	const meta = document.createElement("div");
 	meta.className = "user-meta";
 	const name = document.createElement("span");
@@ -76,7 +77,7 @@ function renderPerson(person) {
 	card.className = "user-result";
 	const avatar = document.createElement("div");
 	avatar.className = "avatar";
-	avatar.textContent = initials(person.fullName);
+	setAvatar(avatar, person.fullName, person.avatarUrl);
 	const main = document.createElement("div");
 	main.className = "user-result-main";
 	const link = document.createElement("a");
@@ -118,8 +119,4 @@ function makeLoading() {
 	loading.className = "loading";
 	loading.textContent = "Searching...";
 	return loading;
-}
-
-function initials(name) {
-	return String(name || "?").trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
 }

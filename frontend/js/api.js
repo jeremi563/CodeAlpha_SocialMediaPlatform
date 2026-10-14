@@ -30,8 +30,12 @@ async function request(method, url, body = null) {
   };
 
   if (body !== null) {
-    options.headers["Content-Type"] = "application/json";
-    options.body = JSON.stringify(body);
+    if (typeof FormData !== "undefined" && body instanceof FormData) {
+      options.body = body;
+    } else {
+      options.headers["Content-Type"] = "application/json";
+      options.body = JSON.stringify(body);
+    }
   }
 
   let response;

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#edf3ef" />
+  <title>Notifications · Social</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/responsive.css" />
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar-left">
+      <a href="/" class="brand"><span class="brand-mark"><svg class="icon"><use href="/static/assets/icons.svg#i-sparkles"></use></svg></span><span>Social</span></a>
+      <nav aria-label="Main navigation">
+        <a href="/"><svg class="icon"><use href="/static/assets/icons.svg#i-home"></use></svg><span>Home</span></a>
+        <a href="/explore"><svg class="icon"><use href="/static/assets/icons.svg#i-compass"></use></svg><span>Explore</span></a>
+        <a href="/notifications" class="active"><svg class="icon"><use href="/static/assets/icons.svg#i-bell"></use></svg><span>Notifications</span><span class="notification-badge" hidden></span></a>
+        <a href="/profile" id="my-profile-link"><svg class="icon"><use href="/static/assets/icons.svg#i-user"></use></svg><span>My profile</span></a>
+        <div class="nav-divider"></div><p class="nav-caption">Your space</p>
+        <a href="#" id="logout-link"><svg class="icon"><use href="/static/assets/icons.svg#i-log-out"></use></svg><span>Log out</span></a>
+      </nav>
+      <div class="sidebar-user" id="sidebar-account" hidden></div>
+    </aside>
+
+    <main class="feed-column">
+      <header class="page-heading notifications-heading">
+        <div><span class="eyebrow">Your activity</span><h1>Notifications</h1><p id="notification-status" aria-live="polite">Checking for updates...</p></div>
+        <button type="button" class="btn btn-secondary" id="mark-all-read" disabled><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-check"></use></svg><span>Mark all read</span></button>
+      </header>
+      <section class="notification-panel" aria-label="Your notifications">
+        <div class="notification-panel-header"><h2>Recent</h2><span><strong id="unread-count">0</strong> unread</span></div>
+        <div id="notification-list" aria-live="polite"><div class="loading">Loading notifications...</div></div>
+      </section>
+      <div class="notification-more"><button type="button" class="btn btn-secondary" id="load-more-notifications" hidden>Load more</button></div>
+    </main>
+
+    <aside class="sidebar-right" aria-label="Notifications">
+      <section class="side-panel"><h2>Stay in the loop</h2><p class="side-note" style="margin:0">Likes, comments, and new followers appear here. You can mark individual items or clear all unread activity.</p></section>
+      <footer class="sidebar-footer">Social · Made for sharing ideas</footer>
+    </aside>
+  </div>
+
+  <script type="module">
+    import { api } from "/static/js/api.js";
+    import { initNotifications } from "/static/js/notifications.js";
+
+    try {
+      const current = await api.get("/api/auth/me");
+      await initNotifications(current.data.user);
+    } catch {
+      window.location.assign("/login");
+    }
+  </script>
+</body>
+</html>

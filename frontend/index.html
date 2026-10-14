@@ -19,6 +19,7 @@
       <nav aria-label="Main navigation">
         <a href="/" class="active"><svg class="icon"><use href="/static/assets/icons.svg#i-home"></use></svg><span>Home</span></a>
         <a href="/explore"><svg class="icon"><use href="/static/assets/icons.svg#i-compass"></use></svg><span>Explore</span></a>
+        <a href="/notifications"><svg class="icon"><use href="/static/assets/icons.svg#i-bell"></use></svg><span>Notifications</span><span class="notification-badge" hidden></span></a>
         <a href="/profile" id="my-profile-link"><svg class="icon"><use href="/static/assets/icons.svg#i-user"></use></svg><span>My profile</span></a>
         <div class="nav-divider"></div>
         <p class="nav-caption">Your space</p>
@@ -70,6 +71,7 @@
     import { initLikes } from "/static/js/likes.js";
     import { initFollows } from "/static/js/follows.js";
     import { initAuth } from "/static/js/auth.js";
+    import { setAvatar } from "/static/js/avatars.js";
 
     const session = await initAuth();
     if (!session) throw new Error("Authentication required");
@@ -78,7 +80,7 @@
     account.hidden = false;
     const avatar = document.createElement("div");
     avatar.className = "avatar avatar-small";
-    avatar.textContent = session.user.fullName.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+    setAvatar(avatar, session.user.fullName, session.user.avatarUrl);
     const meta = document.createElement("div");
     meta.className = "user-meta";
     const name = document.createElement("span");
@@ -89,11 +91,12 @@
     handle.textContent = `@${session.user.username}`;
     meta.append(name, handle);
     account.append(avatar, meta);
-    document.getElementById("composer-avatar").textContent = avatar.textContent;
+    setAvatar(document.getElementById("composer-avatar"), session.user.fullName, session.user.avatarUrl);
     await initComments();
     initLikes();
     initFollows();
     initFeed();
   </script>
+  <script type="module" src="/static/js/notification-badge.js"></script>
 </body>
 </html>

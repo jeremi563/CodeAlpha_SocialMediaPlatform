@@ -2,6 +2,8 @@
 
 This project is a single Node.js/Express web service. Express serves both the REST API and the static frontend, so deploy one **Web Service**; do not create a separate static site for `frontend/`.
 
+Uploaded profile pictures are stored in MongoDB Atlas with GridFS. No Render persistent disk is required for profile-picture persistence.
+
 ## Before you start
 
 You need:

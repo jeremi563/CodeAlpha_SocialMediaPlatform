@@ -1,5 +1,6 @@
 import { Follow } from "../models/follow.model.js";
 import { User } from "../models/user.model.js";
+import { createNotificationSafely } from "./notification.service.js";
 
 /**
  * Follow business logic.
@@ -44,6 +45,11 @@ export async function followUser(followerId, targetUserId) {
     await Follow.create({
       follower: followerId,
       following: targetUserId,
+    });
+    await createNotificationSafely({
+      recipientId: targetUserId,
+      actorId: followerId,
+      type: "follow",
     });
     return { created: true };
   } catch (err) {

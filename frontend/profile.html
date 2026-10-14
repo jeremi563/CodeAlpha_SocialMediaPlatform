@@ -17,6 +17,7 @@
       <nav aria-label="Main navigation">
         <a href="/"><svg class="icon"><use href="/static/assets/icons.svg#i-home"></use></svg><span>Home</span></a>
         <a href="/explore"><svg class="icon"><use href="/static/assets/icons.svg#i-compass"></use></svg><span>Explore</span></a>
+          <a href="/notifications"><svg class="icon"><use href="/static/assets/icons.svg#i-bell"></use></svg><span>Notifications</span><span class="notification-badge" hidden></span></a>
         <a href="/profile" id="my-profile-link" class="active"><svg class="icon"><use href="/static/assets/icons.svg#i-user"></use></svg><span>My profile</span></a>
         <div class="nav-divider"></div><p class="nav-caption">Your space</p>
         <a href="#" id="logout-link"><svg class="icon"><use href="/static/assets/icons.svg#i-log-out"></use></svg><span>Log out</span></a>
@@ -29,6 +30,7 @@
       <div id="profile-root">
         <div class="loading">Loading profile...</div>
       </div>
+      <input id="profile-picture-input" type="file" accept="image/jpeg,image/png,image/webp" hidden />
       <div class="profile-tabs"><a href="#user-posts" class="active">Posts</a><a href="#profile-root">About</a></div>
       <div id="user-posts"></div>
     </main>
@@ -45,6 +47,7 @@
     import { initLikes } from "/static/js/likes.js";
     import { initComments } from "/static/js/comments.js";
     import { api } from "/static/js/api.js";
+    import { setAvatar } from "/static/js/avatars.js";
 
     let currentUser = null;
     try {
@@ -56,7 +59,7 @@
       account.hidden = false;
       const avatar = document.createElement("div");
       avatar.className = "avatar avatar-small";
-      avatar.textContent = currentUser.fullName.trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+      setAvatar(avatar, currentUser.fullName, currentUser.avatarUrl);
       const meta = document.createElement("div");
       meta.className = "user-meta";
       const name = document.createElement("span");
@@ -84,5 +87,6 @@
     initFollows();
     initProfile();
   </script>
+  <script type="module" src="/static/js/notification-badge.js"></script>
 </body>
 </html>

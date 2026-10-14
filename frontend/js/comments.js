@@ -1,5 +1,6 @@
 import { api, escapeHtml, timeAgo, toast } from "/static/js/api.js";
 import { openFormDialog } from "/static/js/dialog.js";
+import { setAvatar } from "/static/js/avatars.js";
 
 let currentUser = null;
 
@@ -76,6 +77,7 @@ function renderComments(section, comments) {
       const isOwner = currentUser && c.author && (c.author.id || c.author._id) === currentUser.id;
       html += `
         <div class="comment">
+          <div class="avatar avatar-small comment-avatar">${escapeHtml(String(c.author?.fullName || "?").trim().split(/\s+/).slice(0, 2).map((part) => part[0]).join("").toUpperCase())}</div>
           <div class="comment-body">
             <div class="comment-author">${escapeHtml(c.author?.fullName || "Unknown")}</div>
             <div class="comment-content">${commentContent}</div>
@@ -94,6 +96,9 @@ function renderComments(section, comments) {
     : `<div class="comment-form"><a class="side-note" href="/login">Sign in to join the conversation.</a></div>`;
 
   section.innerHTML = html;
+  section.querySelectorAll(".comment-avatar").forEach((avatar, index) => {
+    setAvatar(avatar, comments[index]?.author?.fullName, comments[index]?.author?.avatarUrl);
+  });
 }
 
 async function submitComment(form) {
