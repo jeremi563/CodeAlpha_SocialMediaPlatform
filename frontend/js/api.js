@@ -72,7 +72,7 @@ export const api = {
   get: (url) => request("GET", url),
   post: (url, body) => request("POST", url, body),
   patch: (url, body) => request("PATCH", url, body),
-  delete: (url) => request("DELETE", url),
+  delete: (url, body) => request("DELETE", url, body ?? null),
 };
 
 /**

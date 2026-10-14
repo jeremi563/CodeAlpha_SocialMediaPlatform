@@ -5,6 +5,7 @@ import {
   searchUsersValidator,
   usernameParamValidator,
   paginationValidator,
+  deleteAccountValidator,
 } from "../validators/user.validator.js";
 import { requireAuth, optionalAuth } from "../middleware/auth.middleware.js";
 import multer from "multer";
@@ -33,6 +34,11 @@ router.post(
   userController.uploadProfilePicture
 );
 router.delete("/me/profile-picture", requireAuth, userController.deleteProfilePicture);
+
+// Account deletion — permanently removes the authenticated user and all
+// associated data (posts, comments, likes, follows, notifications, avatar).
+// Requires password confirmation. Section 5.10.
+router.delete("/me", requireAuth, deleteAccountValidator, userController.deleteAccount);
 
 // Search (Section 9.2: auth required)
 router.get(

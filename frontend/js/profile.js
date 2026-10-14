@@ -52,7 +52,7 @@ function renderProfile(root, user, stats) {
 
   let actionHtml = "";
   if (isMe) {
-    actionHtml = `<button type="button" class="btn btn-secondary" id="change-profile-picture-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-image"></use></svg><span>${user.avatarUrl ? "Change photo" : "Add photo"}</span></button>${user.avatarUrl ? '<button type="button" class="btn btn-secondary btn-danger" id="remove-profile-picture-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-trash"></use></svg><span>Remove photo</span></button>' : ""}<button type="button" class="btn btn-secondary" id="edit-profile-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-edit"></use></svg><span>Edit profile</span></button>`;
+    actionHtml = `<button type="button" class="btn btn-secondary" id="change-profile-picture-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-image"></use></svg><span>${user.avatarUrl ? "Change photo" : "Add photo"}</span></button>${user.avatarUrl ? '<button type="button" class="btn btn-secondary btn-danger" id="remove-profile-picture-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-trash"></use></svg><span>Remove photo</span></button>' : ""}<button type="button" class="btn btn-secondary" id="edit-profile-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-edit"></use></svg><span>Edit profile</span></button><button type="button" class="btn btn-danger" id="delete-account-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-trash"></use></svg><span>Delete account</span></button>`;
   } else if (currentUser) {
     actionHtml = `
       <button type="button" class="btn ${stats.isFollowing ? "btn-secondary following" : "btn-primary"} follow-btn"
@@ -90,6 +90,9 @@ function renderProfile(root, user, stats) {
     });
     document.getElementById("profile-picture-input").addEventListener("change", uploadProfilePicture, { once: true });
     document.getElementById("remove-profile-picture-btn")?.addEventListener("click", removeProfilePicture);
+
+    const deleteBtn = document.getElementById("delete-account-btn");
+    deleteBtn.addEventListener("click", openDeleteAccountDialog);
   }
 }
 
@@ -176,5 +179,40 @@ async function openEditForm(user) {
     }
   } catch (error) {
     toast(error.message || "Could not update your profile.", "error");
+  }
+}
+
+/**
+ * Opens a confirmation dialog and deletes the current user's account.
+ * On success, redirects to the login page.
+ */
+async function openDeleteAccountDialog() {
+  const confirmed = await openFormDialog({
+    title: "Delete your account",
+    submitLabel: "Delete account permanently",
+    fields: [
+      {
+        name: "password",
+        label: "Type your password to confirm",
+        value: "",
+        type: "password",
+        required: true,
+        placeholder: "Password",
+      },
+    ],
+  });
+
+  if (!confirmed) return;
+
+  try {
+    await api.delete("/api/users/me", { password: confirmed.password });
+    toast("Your account has been deleted.", "success");
+    window.location.href = "/login";
+  } catch (error) {
+    if (error.status === 403) {
+      toast("Incorrect password. Account not deleted.", "error");
+    } else {
+      toast(error.message || "Could not delete your account.", "error");
+    }
   }
 }

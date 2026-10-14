@@ -35,6 +35,7 @@ export function openFormDialog({ title, fields, submitLabel = "Save changes" }) 
       control.name = field.name;
       control.value = field.value ?? "";
       control.maxLength = field.maxLength ?? 2000;
+      if (field.type) control.type = field.type;
       if (field.placeholder) control.placeholder = field.placeholder;
       if (field.pattern) control.pattern = field.pattern;
       if (field.multiline) control.rows = field.rows ?? 4;

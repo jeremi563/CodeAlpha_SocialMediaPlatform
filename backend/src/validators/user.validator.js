@@ -85,3 +85,15 @@ export const paginationValidator = [
     .withMessage("limit must be between 1 and 50.")
     .toInt(),
 ];
+
+/**
+ * DELETE /api/users/me
+ * Requires the current password for confirmation.
+ */
+export const deleteAccountValidator = [
+  body("password")
+    .isString()
+    .withMessage("Password must be a string.")
+    .notEmpty()
+    .withMessage("Password is required to confirm account deletion."),
+];

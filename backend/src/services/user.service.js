@@ -1,7 +1,12 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 import { User } from "../models/user.model.js";
 import { Post } from "../models/post.model.js";
 import { Follow } from "../models/follow.model.js";
+import { Comment } from "../models/comment.model.js";
+import { Like } from "../models/like.model.js";
+import { Notification } from "../models/notification.model.js";
+import * as profilePictureService from "./profile-picture.service.js";
 import { PAGINATION } from "../config/constants.js";
 
 /**
@@ -166,6 +171,79 @@ export async function findUserByIdentifierOrId(value) {
     return User.findById(value).lean();
   }
   return User.findOne({ username: value }).lean();
+}
+
+/**
+ * Permanently deletes a user account and all associated data.
+ *
+ * Cascade order (Section 5.10):
+ *   1. Delete the user's profile picture from GridFS (best-effort).
+ *   2. Delete all posts authored by the user — this cascades to
+ *      their comments and likes via post.service.deletePost semantics.
+ *   3. Delete comments authored by the user on OTHER users' posts.
+ *   4. Delete likes created by the user.
+ *   5. Delete follow relationships where the user is follower OR following.
+ *   6. Delete notifications where the user is recipient OR actor.
+ *   7. Delete the user document itself.
+ *
+ * The password is verified before any deletion occurs so that
+ * an accidental or malicious request cannot wipe an account.
+ *
+ * Returns true if the user was found and deleted, false if not found.
+ * Throws with status 403 if the password does not match.
+ */
+export async function deleteAccount(userId, password) {
+  const user = await User.findById(userId).select("+passwordHash");
+  if (!user) return false;
+
+  const ok = await bcrypt.compare(password, user.passwordHash);
+  if (!ok) {
+    const err = new Error("Incorrect password.");
+    err.status = 403;
+    throw err;
+  }
+
+  const id = user._id;
+
+  // 1. Remove profile picture from GridFS (best-effort — never block deletion).
+  if (user.profilePictureId) {
+    await profilePictureService.removeProfilePicture(userId).catch((err) => {
+      console.error("[account] Failed to remove profile picture during deletion:", err.message);
+    });
+  }
+
+  // 2. Delete all posts authored by this user.
+  //    Each post deletion also removes its comments, likes, and notifications.
+  const userPosts = await Post.find({ author: id }).select("_id");
+  for (const post of userPosts) {
+    await Post.deleteOne({ _id: post._id });
+    await Promise.all([
+      Comment.deleteMany({ post: post._id }),
+      Like.deleteMany({ post: post._id }),
+      Notification.deleteMany({ post: post._id }),
+    ]);
+  }
+
+  // 3. Delete comments authored by the user on other posts.
+  await Comment.deleteMany({ author: id });
+
+  // 4. Delete likes created by the user.
+  await Like.deleteMany({ user: id });
+
+  // 5. Delete follow relationships involving this user (both directions).
+  await Follow.deleteMany({
+    $or: [{ follower: id }, { following: id }],
+  });
+
+  // 6. Delete notifications where the user is recipient or actor.
+  await Notification.deleteMany({
+    $or: [{ recipient: id }, { actor: id }],
+  });
+
+  // 7. Finally, delete the user document.
+  await User.deleteOne({ _id: id });
+
+  return true;
 }
 
 function publicAuthor(author) {

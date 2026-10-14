@@ -196,6 +196,52 @@ export async function updateMe(req, res, next) {
 }
 
 /**
+ * DELETE /api/users/me
+ * Auth: required.
+ * Permanently deletes the authenticated user's account and all
+ * associated data (posts, comments, likes, follows, notifications,
+ * profile picture). Requires the current password for confirmation.
+ * Section 5.10.
+ */
+export async function deleteAccount(req, res, next) {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed.",
+        errors: errors.array().map((e) => ({ field: e.path, message: e.msg })),
+      });
+    }
+
+    const deleted = await userService.deleteAccount(req.userId, req.body.password);
+
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    // Destroy the session so the user is logged out after deletion.
+    if (req.session) {
+      return req.session.destroy((err) => {
+        if (err) return next(err);
+        res.clearCookie("smp.sid");
+        return res.status(200).json({
+          success: true,
+          message: "Your account and all associated data have been permanently deleted.",
+        });
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Your account and all associated data have been permanently deleted.",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
  * GET /api/users/:username/posts?page=&limit=
  * Public. Paginated list of a user's posts.
  */
