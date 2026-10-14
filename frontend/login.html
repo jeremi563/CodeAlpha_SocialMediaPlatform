@@ -27,7 +27,7 @@
         <div class="auth-error" id="auth-error" role="alert" aria-live="polite"></div>
         <form id="login-form" class="auth-form" novalidate>
           <div class="auth-field"><label for="identifier">Username or email</label><input type="text" id="identifier" name="identifier" required autocomplete="username" placeholder="you@example.com" /></div>
-          <div class="auth-field"><label for="password">Password</label><input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter your password" /></div>
+          <div class="auth-field"><label for="password">Password</label><div class="password-control"><input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter your password" /><button type="button" class="password-toggle" data-password-toggle aria-controls="password" aria-label="Show password" title="Show password" aria-pressed="false"><svg class="icon icon-sm" aria-hidden="true"><use href="/static/assets/icons.svg#i-eye"></use></svg></button></div></div>
           <button type="submit" class="btn btn-primary btn-wide" id="submit-btn"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-lock"></use></svg><span>Sign in</span></button>
         </form>
         <p class="auth-switch">New to Social? <a href="/register">Create an account</a></p>
@@ -75,5 +75,6 @@
       }
     });
   </script>
+  <script type="module" src="/static/js/password-visibility.js"></script>
 </body>
 </html>

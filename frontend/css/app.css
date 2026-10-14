@@ -340,6 +340,11 @@ button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 .auth-field label, .field label { display: block; margin-bottom: 6px; color: var(--ink-soft); font-size: 12px; font-weight: 700; }
 .auth-field input, .field input, .field textarea { min-height: 44px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fbfcfb; outline: none; }
 .auth-field input:focus, .field input:focus, .field textarea:focus, .search-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(31,113,87,.1); }
+.password-control { position: relative; }
+.password-control input { padding-right: 48px; }
+.password-toggle { position: absolute; top: 50%; right: 5px; display: grid; width: 36px; height: 36px; min-height: 36px; padding: 0; transform: translateY(-50%); place-items: center; border: 0; border-radius: 7px; background: transparent; color: var(--muted); }
+.password-toggle:hover { background: var(--green-wash); color: var(--green-strong); }
+.password-toggle:focus-visible { outline-offset: 0; }
 .auth-error { display: none; margin: 0 0 15px; padding: 11px 12px; border: 1px solid #f0cbc5; border-radius: 8px; background: var(--coral-wash); color: #9d3f35; font-size: 13px; }
 .auth-error.visible { display: block; }
 .auth-notice { margin: 0 0 15px; padding: 11px 12px; border: 1px solid #cce2d4; border-radius: 8px; background: var(--green-wash); color: var(--green-strong); font-size: 13px; }
