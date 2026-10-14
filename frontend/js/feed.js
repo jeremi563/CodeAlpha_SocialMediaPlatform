@@ -7,6 +7,8 @@ let currentPage = 1;
 let totalPages = 1;
 let postActionsAttached = false;
 const LIMIT = 10;
+const FEED_REFRESH_INTERVAL_MS = 15000;
+let feedRefreshInFlight = false;
 
 export function setPostCurrentUser(user) {
   currentUser = user;
@@ -61,6 +63,50 @@ export async function initFeed() {
   });
 
   await loadFeed();
+  window.setInterval(() => {
+    if (document.visibilityState === "visible") refreshLatestPosts();
+  }, FEED_REFRESH_INTERVAL_MS);
+}
+
+async function refreshLatestPosts() {
+  if (feedRefreshInFlight) return;
+  feedRefreshInFlight = true;
+  try {
+    const response = await api.get(`/api/posts?page=1&limit=${LIMIT}`);
+    const { posts, pagination } = response.data;
+    const feed = document.getElementById("feed");
+    const existing = new Map(
+      [...feed.querySelectorAll(":scope > .post")].map((card) => [card.dataset.postId, card])
+    );
+    const newPosts = [];
+
+    for (const post of posts) {
+      const oldCard = existing.get(post.id);
+      if (!oldCard) {
+        newPosts.push(post);
+        continue;
+      }
+
+      const refreshedCard = renderPost(post);
+      const oldComments = oldCard.querySelector(".comments-section");
+      const newComments = refreshedCard.querySelector(".comments-section");
+      if (oldComments && newComments) refreshedCard.replaceChild(oldComments, newComments);
+      oldCard.replaceWith(refreshedCard);
+    }
+
+    for (const post of newPosts.reverse()) {
+      const emptyState = feed.querySelector(":scope > .empty-state");
+      emptyState?.remove();
+      feed.prepend(renderPost(post));
+    }
+
+    totalPages = pagination.totalPages;
+    document.getElementById("load-more").style.display = currentPage < totalPages ? "inline-block" : "none";
+  } catch {
+    // A transient poll failure should not replace usable feed content.
+  } finally {
+    feedRefreshInFlight = false;
+  }
 }
 
 /**

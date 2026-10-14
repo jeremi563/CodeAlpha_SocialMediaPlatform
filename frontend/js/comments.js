@@ -3,6 +3,8 @@ import { openFormDialog } from "/static/js/dialog.js";
 import { setAvatar } from "/static/js/avatars.js";
 
 let currentUser = null;
+const COMMENT_REFRESH_INTERVAL_MS = 15000;
+const commentsRefreshInFlight = new WeakSet();
 
 export async function initComments() {
   // Wire click delegation for the comments toggle button
@@ -43,6 +45,16 @@ export async function initComments() {
   } catch {
     currentUser = null;
   }
+
+  window.setInterval(() => {
+    if (document.visibilityState !== "visible") return;
+    document.querySelectorAll(".comments-section:not([hidden])").forEach((section) => {
+      const form = section.querySelector(".comment-form");
+      const input = form?.querySelector('input[name="content"]');
+      if (!form || form.querySelector("button[disabled]") || document.activeElement === input) return;
+      loadComments(section, { silent: true });
+    });
+  }, COMMENT_REFRESH_INTERVAL_MS);
 }
 
 async function toggleComments(postId) {
@@ -163,8 +175,17 @@ async function editComment(commentId, currentContent, section) {
   }
 }
 
-async function loadComments(section) {
-  if (!section) return;
-  const result = await api.get(`/api/posts/${section.dataset.postId}/comments?limit=50`);
-  renderComments(section, result.data.comments);
+async function loadComments(section, { silent = false } = {}) {
+  if (!section || commentsRefreshInFlight.has(section)) return;
+  commentsRefreshInFlight.add(section);
+  try {
+    const result = await api.get(`/api/posts/${section.dataset.postId}/comments?limit=50`);
+    renderComments(section, result.data.comments);
+    const count = document.querySelector(`.comments-toggle[data-post-id="${section.dataset.postId}"] .comment-count`);
+    if (count && result.data.pagination) count.textContent = result.data.pagination.total;
+  } catch (error) {
+    if (!silent) throw error;
+  } finally {
+    commentsRefreshInFlight.delete(section);
+  }
 }

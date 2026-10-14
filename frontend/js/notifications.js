@@ -2,8 +2,10 @@ import { api, timeAgo, toast } from "/static/js/api.js";
 import { setAvatar } from "/static/js/avatars.js";
 
 const PAGE_SIZE = 20;
+const NOTIFICATION_REFRESH_INTERVAL_MS = 20000;
 let page = 1;
 let totalPages = 1;
+let notificationRefreshInFlight = false;
 
 export async function initNotifications(user) {
   document.getElementById("my-profile-link").href = `/profile?username=${encodeURIComponent(user.username)}`;
@@ -19,6 +21,43 @@ export async function initNotifications(user) {
     await loadNotifications(true);
   });
   await loadNotifications();
+  window.setInterval(() => {
+    if (document.visibilityState === "visible") refreshNotifications();
+  }, NOTIFICATION_REFRESH_INTERVAL_MS);
+}
+
+async function refreshNotifications() {
+  if (notificationRefreshInFlight) return;
+  notificationRefreshInFlight = true;
+  try {
+    const response = await api.get(`/api/notifications?page=1&limit=${PAGE_SIZE}`);
+    const { notifications, unreadCount } = response.data;
+    const list = document.getElementById("notification-list");
+    const existing = new Map(
+      [...list.querySelectorAll(".notification-item")].map((item) => [item.dataset.notificationId, item])
+    );
+    const newItems = [];
+
+    for (const notification of notifications) {
+      const item = existing.get(notification.id);
+      if (!item) {
+        newItems.push(notification);
+      } else if (notification.readAt) {
+        markItemRead(item);
+      }
+    }
+
+    list.querySelector(".notification-empty")?.remove();
+    for (const notification of newItems.reverse()) list.prepend(renderNotification(notification));
+    document.getElementById("unread-count").textContent = unreadCount;
+    document.getElementById("mark-all-read").disabled = unreadCount === 0;
+    document.getElementById("notification-status").textContent = unreadCount ? `${unreadCount} unread` : "You're all caught up";
+    updateBadge(unreadCount);
+  } catch {
+    // Keep the current inbox visible if a background refresh fails.
+  } finally {
+    notificationRefreshInFlight = false;
+  }
 }
 
 async function loadNotifications(append = false) {
@@ -106,9 +145,7 @@ async function markOneRead(id, item) {
   if (!item.classList.contains("is-unread")) return;
   try {
     await api.patch(`/api/notifications/${id}/read`);
-    item.classList.remove("is-unread");
-    item.querySelector(".notification-mark-read")?.remove();
-    item.querySelector(".notification-unread-dot")?.setAttribute("aria-label", "Read");
+    markItemRead(item);
     const unread = document.getElementById("unread-count");
     const next = Math.max(0, Number(unread.textContent) - 1);
     unread.textContent = next;
@@ -126,9 +163,7 @@ async function markAllRead() {
   try {
     await api.patch("/api/notifications/read-all");
     document.querySelectorAll(".notification-item.is-unread").forEach((item) => {
-      item.classList.remove("is-unread");
-      item.querySelector(".notification-mark-read")?.remove();
-      item.querySelector(".notification-unread-dot")?.setAttribute("aria-label", "Read");
+      markItemRead(item);
     });
     document.getElementById("unread-count").textContent = "0";
     document.getElementById("notification-status").textContent = "You're all caught up";
@@ -138,6 +173,12 @@ async function markAllRead() {
     button.disabled = false;
     toast(error.message || "Could not update notifications.", "error");
   }
+}
+
+function markItemRead(item) {
+  item.classList.remove("is-unread");
+  item.querySelector(".notification-mark-read")?.remove();
+  item.querySelector(".notification-unread-dot")?.setAttribute("aria-label", "Read");
 }
 
 function setSidebarAccount(user) {

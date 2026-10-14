@@ -9,6 +9,7 @@ A social media MVP built with a vanilla HTML/CSS/JavaScript frontend, a Node.js 
 - Chronological paginated post feed with owner-only editing and deletion.
 - Comments, likes, follows, and follower/following lists.
 - A paginated notifications inbox for likes, comments, and new followers, with unread counts and read controls.
+- Visible feeds and open comment threads refresh automatically; notification counts and inbox updates poll in the background without a page reload.
 - Responsive frontend with SVG icons and accessible interaction states.
 
 ## Technology
