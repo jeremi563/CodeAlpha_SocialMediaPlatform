@@ -2,6 +2,8 @@ import { validationResult } from "express-validator";
 import * as userService from "../services/user.service.js";
 import { PAGINATION } from "../config/constants.js";
 import * as followService from "../services/follow.service.js";
+import * as profilePictureService from "../services/profile-picture.service.js";
+import sharp from "sharp";
 
 /**
  * Strips any fields that should never appear in a public response,
@@ -10,8 +12,91 @@ import * as followService from "../services/follow.service.js";
  */
 function toPublicUser(doc) {
   if (!doc) return null;
-  const { _id, passwordHash, email, __v, ...rest } = doc;
-  return { id: _id.toString(), ...rest };
+  const { _id, passwordHash, email, profilePictureId, __v, ...rest } = doc;
+  const result = { id: _id.toString(), ...rest };
+  if (profilePictureId) {
+    result.avatarUrl = `/api/users/${encodeURIComponent(result.username)}/avatar/${profilePictureId}`;
+  }
+  return result;
+}
+
+export async function uploadProfilePicture(req, res, next) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Choose an image to upload." });
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(req.file.mimetype)) {
+      return res.status(415).json({
+        success: false,
+        message: "Profile pictures must be JPEG, PNG, or WebP images.",
+      });
+    }
+
+    const image = sharp(req.file.buffer, { limitInputPixels: 40_000_000 });
+    const metadata = await image.metadata();
+    if (!["jpeg", "png", "webp"].includes(metadata.format)) {
+      return res.status(415).json({
+        success: false,
+        message: "Profile pictures must be JPEG, PNG, or WebP images.",
+      });
+    }
+
+    const normalized = await image
+      .rotate()
+      .resize(512, 512, { fit: "cover", position: "attention" })
+      .webp({ quality: 82 })
+      .toBuffer();
+    const user = await profilePictureService.saveProfilePicture(req.userId, normalized);
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile picture updated.",
+      data: { avatarUrl: user.toJSON().avatarUrl },
+    });
+  } catch (err) {
+    if (err.message?.includes("Input buffer")) {
+      return res.status(400).json({ success: false, message: "The uploaded file is not a valid image." });
+    }
+    if (err.message?.includes("pixel limit")) {
+      return res.status(400).json({ success: false, message: "The image dimensions are too large." });
+    }
+    next(err);
+  }
+}
+
+export async function deleteProfilePicture(req, res, next) {
+  try {
+    const removed = await profilePictureService.removeProfilePicture(req.userId);
+    if (!removed) return res.status(404).json({ success: false, message: "User not found." });
+    return res.status(200).json({ success: true, message: "Profile picture removed." });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getProfilePicture(req, res, next) {
+  try {
+    const user = await userService.getPublicProfile(req.params.username);
+    if (!user || !user.profilePictureId || user.profilePictureId.toString() !== req.params.pictureId) {
+      return res.status(404).json({ success: false, message: "Profile picture not found." });
+    }
+
+    const picture = await profilePictureService.openProfilePicture(req.params.pictureId);
+    if (!picture) return res.status(404).json({ success: false, message: "Profile picture not found." });
+
+    res.set({
+      "Content-Type": "image/webp",
+      "Cache-Control": "public, max-age=86400",
+      "X-Content-Type-Options": "nosniff",
+    });
+    picture.stream.on("error", (err) => {
+      if (res.headersSent) res.destroy(err);
+      else next(err);
+    });
+    picture.stream.pipe(res);
+  } catch (err) {
+    next(err);
+  }
 }
 
 /**

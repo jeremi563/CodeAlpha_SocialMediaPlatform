@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema({
         default: "",
         trim:true,
         maxlength:[LIMITS.BIO_MAX,`Bio cannot exceed ${LIMITS.BIO_MAX} characters`]
+    },
+    profilePictureId: {
+        type: mongoose.Schema.Types.ObjectId,
+        default: null,
     }
 },baseSchemaOptions);
 
@@ -44,8 +48,12 @@ userSchema.set('toJSON',{
     ...baseSchemaOptions.toJSON,
     transform: (doc, ret) => {
         ret.id = ret._id.toString();
+        if (ret.profilePictureId) {
+            ret.avatarUrl = `/api/users/${encodeURIComponent(ret.username)}/avatar/${ret.profilePictureId}`;
+        }
         delete ret._id;
         delete ret.passwordHash;
+        delete ret.profilePictureId;
         return ret;
     }
 })

@@ -33,7 +33,7 @@ export async function getFeed({ page, limit, currentUserId = null }) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("author", "fullName username")
+      .populate("author", "fullName username profilePictureId")
       .lean(),
     Post.countDocuments(),
   ]);
@@ -49,7 +49,7 @@ export async function getFeed({ page, limit, currentUserId = null }) {
  */
 export async function getPostById(postId, currentUserId = null) {
   const post = await Post.findById(postId)
-    .populate("author", "fullName username")
+    .populate("author", "fullName username profilePictureId")
     .lean();
 
   if (!post) return null;
@@ -158,7 +158,7 @@ async function enrichPosts(posts, currentUserId) {
     const idStr = post._id.toString();
     return {
       id: idStr,
-      author: post.author,
+      author: toPublicAuthor(post.author),
       content: post.content,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
@@ -167,4 +167,17 @@ async function enrichPosts(posts, currentUserId) {
       likedByMe: likedSet.has(idStr),
     };
   });
+}
+
+function toPublicAuthor(author) {
+  if (!author) return null;
+  const result = {
+    id: author._id.toString(),
+    fullName: author.fullName,
+    username: author.username,
+  };
+  if (author.profilePictureId) {
+    result.avatarUrl = `/api/users/${encodeURIComponent(author.username)}/avatar/${author.profilePictureId}`;
+  }
+  return result;
 }

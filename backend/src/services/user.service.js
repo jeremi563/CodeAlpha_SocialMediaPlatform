@@ -89,7 +89,7 @@ export async function searchUsers(query, limit = 10) {
   const regex = new RegExp("^" + escaped, "i");
 
   return User.find({ username: regex })
-    .select("fullName username bio")
+    .select("fullName username bio profilePictureId")
     .limit(limit)
     .lean();
 }
@@ -106,12 +106,15 @@ export async function getUserPosts(userId, { page, limit }) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("author", "fullName username")
+      .populate("author", "fullName username profilePictureId")
       .lean(),
     Post.countDocuments({ author: userId }),
   ]);
 
-  return { posts, total };
+  return {
+    posts: posts.map((post) => ({ ...post, author: publicAuthor(post.author) })),
+    total,
+  };
 }
 
 /**
@@ -126,7 +129,7 @@ export async function getFollowers(userId, { page, limit }) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("follower", "fullName username bio")
+      .populate("follower", "fullName username bio profilePictureId")
       .lean(),
     Follow.countDocuments({ following: userId }),
   ]);
@@ -146,7 +149,7 @@ export async function getFollowing(userId, { page, limit }) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("following", "fullName username bio")
+      .populate("following", "fullName username bio profilePictureId")
       .lean(),
     Follow.countDocuments({ follower: userId }),
   ]);
@@ -163,4 +166,17 @@ export async function findUserByIdentifierOrId(value) {
     return User.findById(value).lean();
   }
   return User.findOne({ username: value }).lean();
+}
+
+function publicAuthor(author) {
+  if (!author) return null;
+  const result = {
+    id: author._id.toString(),
+    fullName: author.fullName,
+    username: author.username,
+  };
+  if (author.profilePictureId) {
+    result.avatarUrl = `/api/users/${encodeURIComponent(author.username)}/avatar/${author.profilePictureId}`;
+  }
+  return result;
 }

@@ -7,8 +7,32 @@ import {
   paginationValidator,
 } from "../validators/user.validator.js";
 import { requireAuth, optionalAuth } from "../middleware/auth.middleware.js";
+import multer from "multer";
 
 const router = Router();
+const profilePictureUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+});
+
+function parseProfilePicture(req, res, next) {
+  profilePictureUpload.single("profilePicture")(req, res, (err) => {
+    if (!err) return next();
+    const status = err.code === "LIMIT_FILE_SIZE" ? 413 : 400;
+    return res.status(status).json({
+      success: false,
+      message: status === 413 ? "Profile pictures must be 5 MB or smaller." : "Invalid image upload.",
+    });
+  });
+}
+
+router.post(
+  "/me/profile-picture",
+  requireAuth,
+  parseProfilePicture,
+  userController.uploadProfilePicture
+);
+router.delete("/me/profile-picture", requireAuth, userController.deleteProfilePicture);
 
 // Search (Section 9.2: auth required)
 router.get(
@@ -24,6 +48,12 @@ router.patch(
   requireAuth,
   updateProfileValidator,
   userController.updateMe
+);
+
+router.get(
+  "/:username/avatar/:pictureId",
+  usernameParamValidator,
+  userController.getProfilePicture
 );
 
 // Public profile lookup

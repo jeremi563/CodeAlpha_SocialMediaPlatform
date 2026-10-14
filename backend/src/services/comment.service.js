@@ -29,7 +29,7 @@ export async function createComment({ postId, authorId, content }) {
 
   // Populate author info for the response so the frontend can
   // render it without a second fetch.
-  await comment.populate("author", "fullName username");
+  await comment.populate("author", "fullName username profilePictureId");
 
   return comment;
 }
@@ -47,7 +47,7 @@ export async function getPostComments(postId, { page, limit }) {
       .sort({ createdAt: 1 })
       .skip(skip)
       .limit(limit)
-      .populate("author", "fullName username")
+      .populate("author", "fullName username profilePictureId")
       .lean(),
     Comment.countDocuments({ post: postId }),
   ]);
@@ -55,7 +55,7 @@ export async function getPostComments(postId, { page, limit }) {
   const shaped = comments.map((c) => ({
     id: c._id.toString(),
     post: c.post.toString(),
-    author: c.author,
+    author: publicAuthor(c.author),
     content: c.content,
     createdAt: c.createdAt,
     updatedAt: c.updatedAt,
@@ -80,7 +80,7 @@ export async function updateComment(commentId, userId, content) {
 
   comment.content = content;
   await comment.save();
-  await comment.populate("author", "fullName username");
+  await comment.populate("author", "fullName username profilePictureId");
 
   return comment;
 }
@@ -101,4 +101,17 @@ export async function deleteComment(commentId, userId) {
 
   await Comment.deleteOne({ _id: comment._id });
   return true;
+}
+
+function publicAuthor(author) {
+  if (!author) return null;
+  const result = {
+    id: author._id.toString(),
+    fullName: author.fullName,
+    username: author.username,
+  };
+  if (author.profilePictureId) {
+    result.avatarUrl = `/api/users/${encodeURIComponent(author.username)}/avatar/${author.profilePictureId}`;
+  }
+  return result;
 }
