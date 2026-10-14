@@ -424,3 +424,199 @@ button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ============================================================
+   Dark Theme — token overrides (applied via data-theme="dark" on <html>)
+   All values are carefully matched to the existing design language.
+   ============================================================ */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Core ink / text colours */
+  --ink:         #d9ede4;
+  --ink-soft:    #a8c4b8;
+  --muted:       #6b8a7e;
+
+  /* Surface / background colours */
+  --canvas:      #0f1f18;
+  --paper:       #172a20;
+  --paper-soft:  #1e3328;
+
+  /* Borders & dividers */
+  --line:        #243d30;
+
+  /* Brand green — slightly brighter for dark bg contrast */
+  --green:       #2a9a72;
+  --green-strong:#1f7157;
+  --green-wash:  #1a3328;
+
+  /* Danger / coral */
+  --coral:       #e8715f;
+  --coral-wash:  #2a1a17;
+
+  /* Gold */
+  --gold:        #d4a44a;
+
+  /* Shadows — deeper on dark */
+  --shadow:      0 10px 30px rgba(0, 0, 0, .35);
+
+  /* main.css compat tokens */
+  --bg:          #0f1f18;
+  --surface:     #172a20;
+  --surface-2:   #1e3328;
+  --border:      #243d30;
+  --text:        #d9ede4;
+  --text-muted:  #6b8a7e;
+  --primary:     #2a9a72;
+  --primary-hover: #1f7157;
+  --danger:      #e8715f;
+  --danger-hover:#c95a4a;
+  --success:     #2a9a72;
+  --shadow-lg:   0 4px 20px rgba(0, 0, 0, .45);
+}
+
+/* Dark-specific surface adjustments */
+[data-theme="dark"] html { background: var(--canvas); }
+[data-theme="dark"] body {
+  background:
+    linear-gradient(90deg, rgba(42, 154, 114, .04) 1px, transparent 1px),
+    linear-gradient(rgba(42, 154, 114, .04) 1px, transparent 1px),
+    var(--canvas);
+  background-size: 28px 28px;
+}
+[data-theme="dark"] .side-panel {
+  border-color: rgba(36, 61, 48, .9);
+  background: rgba(23, 42, 32, .88);
+}
+[data-theme="dark"] .surface,
+[data-theme="dark"] .card,
+[data-theme="dark"] .post,
+[data-theme="dark"] .composer,
+[data-theme="dark"] .profile-header,
+[data-theme="dark"] .auth-card {
+  border-color: rgba(36, 61, 48, .9);
+  background: var(--paper);
+}
+[data-theme="dark"] .sidebar-left nav a:hover { background: rgba(42, 154, 114, .12); }
+[data-theme="dark"] .sidebar-left nav a.active { background: rgba(42, 154, 114, .18); }
+[data-theme="dark"] .post-menu-items { background: var(--paper); border-color: var(--line); }
+[data-theme="dark"] .notification-item.is-unread { background: rgba(42, 154, 114, .10); }
+[data-theme="dark"] .notification-item.is-unread:hover { background: rgba(42, 154, 114, .16); }
+[data-theme="dark"] .modal-backdrop { background: rgba(0, 0, 0, .65); }
+[data-theme="dark"] .dialog { background: var(--paper); border-color: var(--line); }
+[data-theme="dark"] .auth-field input,
+[data-theme="dark"] .field input,
+[data-theme="dark"] .field textarea { background: var(--canvas); border-color: var(--line); color: var(--ink); }
+[data-theme="dark"] .comment-form input,
+[data-theme="dark"] .field input,
+[data-theme="dark"] .field textarea,
+[data-theme="dark"] .search-input { background: var(--paper-soft); border-color: var(--line); }
+[data-theme="dark"] .auth-field input { background: var(--canvas); }
+[data-theme="dark"] .admin-stat { background: rgba(23, 42, 32, .72); border-color: var(--line); }
+[data-theme="dark"] .admin-workspace { background: var(--paper); border-color: var(--line); }
+[data-theme="dark"] .admin-state { background: var(--paper-soft); }
+[data-theme="dark"] .toast { background: #0c1a12; border-color: rgba(255,255,255,.08); }
+[data-theme="dark"] .toast-success { background: var(--green-strong); }
+[data-theme="dark"] .toast-error { background: #8b2e26; }
+[data-theme="dark"] .auth-wrap { background: var(--paper); }
+[data-theme="dark"] .auth-panel { background: var(--paper); }
+[data-theme="dark"] .composer textarea { color: var(--ink); }
+[data-theme="dark"] .composer textarea::placeholder { color: #4a6b5e; }
+[data-theme="dark"] .search-bar { background: var(--paper); border-color: var(--line); }
+[data-theme="dark"] .user-result { background: var(--paper); border-color: var(--line); }
+[data-theme="dark"] .notification-panel { background: var(--paper); border-color: var(--line); }
+
+/* Mobile dark sidebar */
+@media (max-width: 720px) {
+  [data-theme="dark"] .sidebar-left {
+    background: rgba(23, 42, 32, .96);
+    border-top-color: var(--line);
+  }
+}
+
+/* ============================================================
+   Theme Toggle Button
+   ============================================================ */
+.theme-toggle-btn {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  gap: 14px;
+  padding: 0 14px;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+.theme-toggle-btn:hover {
+  background: rgba(255,255,255,.72);
+  color: var(--green-strong);
+  transform: translateX(2px);
+}
+[data-theme="dark"] .theme-toggle-btn:hover {
+  background: rgba(42, 154, 114, .12);
+}
+.theme-toggle-btn .theme-icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform .3s ease, opacity .2s ease;
+}
+.theme-toggle-btn:hover .theme-icon { transform: rotate(20deg); }
+[data-theme="dark"] .theme-toggle-btn:hover .theme-icon { transform: rotate(-15deg); }
+
+/* Auth page floating placement */
+.theme-toggle-btn--auth {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: auto;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  z-index: 10;
+}
+.theme-toggle-btn--auth:hover { transform: none; }
+
+/* Mobile: in the tab-bar the button is icon-only */
+@media (max-width: 720px) {
+  .theme-toggle-btn {
+    min-height: 60px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 5px 3px;
+    border-radius: 0;
+    color: var(--muted);
+    font-size: 10px;
+    transform: none !important;
+  }
+  .theme-toggle-btn:hover { background: transparent; color: var(--green); }
+  [data-theme="dark"] .theme-toggle-btn:hover { background: transparent; }
+  .theme-toggle-btn .theme-icon { width: 21px; height: 21px; }
+  .theme-toggle-btn--auth {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    min-height: 36px;
+    padding: 0 11px;
+    flex-direction: row;
+    gap: 8px;
+    font-size: 12px;
+    border-radius: 18px;
+  }
+}

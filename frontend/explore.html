@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="/static/css/main.css" />
   <link rel="stylesheet" href="/static/css/responsive.css" />
   <link rel="stylesheet" href="/static/css/app.css" />
+  <!-- Anti-FOUC: apply saved theme before first paint -->
+  <script>try{var t=localStorage.getItem('social-theme');if(t==='dark'||(t===null&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}</script>
 </head>
 <body>
   <div class="app-layout">
@@ -52,5 +54,6 @@
   </script>
   <script type="module" src="/static/js/notification-badge.js"></script>
   <script type="module" src="/static/js/admin-nav.js"></script>
+  <script type="module" src="/static/js/theme.js"></script>
 </body>
 </html>
