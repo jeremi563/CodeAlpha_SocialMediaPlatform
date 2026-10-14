@@ -1417,6 +1417,30 @@ Purpose: Mark all of the authenticated user's unread notifications as read.
 
 Authentication: Required.
 
+## 9.8 Administrative Endpoints
+
+All administrative endpoints require an authenticated account with the `admin` role. The role is assigned out-of-band and cannot be selected during registration or profile editing.
+
+### GET /api/admin/overview
+
+Purpose: Retrieve aggregate account and content counts for the administration console.
+
+### GET /api/admin/users?page=&limit=&q=
+
+Purpose: Retrieve a paginated account list, optionally filtered by name, username, or email. Password hashes are never returned.
+
+### PATCH /api/admin/users/:userId/status
+
+Purpose: Activate or suspend an account using the `isActive` boolean field. Suspended accounts cannot log in or use protected API operations. Administrators cannot suspend their own account.
+
+### GET /api/admin/posts?page=&limit= and DELETE /api/admin/posts/:postId
+
+Purpose: Review and remove posts. Removing a post also removes its comments, likes, and post-linked notifications.
+
+### GET /api/admin/comments?page=&limit= and DELETE /api/admin/comments/:commentId
+
+Purpose: Review and remove comments.
+
 ---
 
 # 10. API RESPONSE AND ERROR HANDLING
@@ -2199,7 +2223,7 @@ The interface may support a dark theme.
 
 ## 19.7 Administrative Tools
 
-An administrative interface may be introduced to support moderation and account management.
+**Status: Implemented.** The protected `/admin` console provides aggregate counts, searchable and paginated account management, account suspension/reactivation, and paginated post/comment moderation. Suspensions are enforced at login and on protected requests. Public registration and profile updates cannot grant administrator privileges. Bootstrap the first administrator by setting the role directly in the trusted MongoDB database; never expose role promotion through an unauthenticated or ordinary user API.
 
 ## 19.8 Content Reporting
 

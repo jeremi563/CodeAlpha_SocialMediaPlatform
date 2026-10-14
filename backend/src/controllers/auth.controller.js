@@ -51,7 +51,7 @@ export async function login(req, res, next) {
     const { identifier, password } = req.body;
 
     const user = await authService.findUserByIdentifier(identifier);
-    if (!user) {
+    if (!user || !user.isActive) {
       // Section 11.3: generic error, do not reveal whether the account exists
       return res.status(401).json({
         success: false,

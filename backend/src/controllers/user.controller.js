@@ -12,7 +12,7 @@ import sharp from "sharp";
  */
 function toPublicUser(doc) {
   if (!doc) return null;
-  const { _id, passwordHash, email, profilePictureId, __v, ...rest } = doc;
+  const { _id, passwordHash, email, profilePictureId, role, isActive, __v, ...rest } = doc;
   const result = { id: _id.toString(), ...rest };
   if (profilePictureId) {
     result.avatarUrl = `/api/users/${encodeURIComponent(result.username)}/avatar/${profilePictureId}`;

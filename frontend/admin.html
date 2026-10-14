@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#edf3ef" />
+  <title>Administration · Social</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="/static/css/responsive.css" />
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar-left">
+      <a href="/" class="brand"><span class="brand-mark"><svg class="icon"><use href="/static/assets/icons.svg#i-sparkles"></use></svg></span><span>Social</span></a>
+      <nav class="has-admin-link" aria-label="Main navigation">
+        <a href="/"><svg class="icon"><use href="/static/assets/icons.svg#i-home"></use></svg><span>Home</span></a>
+        <a href="/explore"><svg class="icon"><use href="/static/assets/icons.svg#i-compass"></use></svg><span>Explore</span></a>
+        <a href="/notifications"><svg class="icon"><use href="/static/assets/icons.svg#i-bell"></use></svg><span>Notifications</span><span class="notification-badge" hidden></span></a>
+        <a href="/profile" id="my-profile-link"><svg class="icon"><use href="/static/assets/icons.svg#i-user"></use></svg><span>My profile</span></a>
+        <a href="/admin" class="active"><svg class="icon"><use href="/static/assets/icons.svg#i-shield"></use></svg><span>Admin</span></a>
+        <div class="nav-divider"></div><p class="nav-caption">Your space</p>
+        <a href="#" id="logout-link"><svg class="icon"><use href="/static/assets/icons.svg#i-log-out"></use></svg><span>Log out</span></a>
+      </nav>
+      <div class="sidebar-user" id="sidebar-account" hidden></div>
+    </aside>
+
+    <main class="feed-column admin-main">
+      <header class="page-heading"><div><span class="eyebrow">Administration</span><h1>Community overview</h1><p>Account status and content moderation.</p></div><span class="admin-access-label"><svg class="icon icon-sm"><use href="/static/assets/icons.svg#i-shield"></use></svg> Admin access</span></header>
+
+      <section class="admin-stats" aria-label="Platform totals">
+        <article class="admin-stat"><span>Accounts</span><strong data-stat="users">—</strong></article>
+        <article class="admin-stat"><span>Active</span><strong data-stat="activeUsers">—</strong></article>
+        <article class="admin-stat"><span>Suspended</span><strong data-stat="suspendedUsers">—</strong></article>
+        <article class="admin-stat"><span>Posts</span><strong data-stat="posts">—</strong></article>
+        <article class="admin-stat"><span>Comments</span><strong data-stat="comments">—</strong></article>
+      </section>
+
+      <section class="admin-workspace" aria-label="Administration tools">
+        <div class="admin-tabs" role="tablist" aria-label="Manage platform records">
+          <button type="button" class="admin-tab active" data-admin-section="users" role="tab" aria-selected="true">Accounts</button>
+          <button type="button" class="admin-tab" data-admin-section="posts" role="tab" aria-selected="false">Posts</button>
+          <button type="button" class="admin-tab" data-admin-section="comments" role="tab" aria-selected="false">Comments</button>
+        </div>
+        <div class="admin-toolbar">
+          <form id="admin-search-form" class="search-bar admin-search" role="search">
+            <svg class="icon"><use href="/static/assets/icons.svg#i-search"></use></svg>
+            <input id="admin-search" type="search" maxlength="80" placeholder="Search name, username, or email" aria-label="Search accounts" />
+            <button type="submit" class="btn btn-primary"><span>Search</span></button>
+          </form>
+          <span id="admin-list-status" class="admin-list-status" aria-live="polite">Loading records...</span>
+        </div>
+        <div id="admin-content" class="admin-record-list" aria-live="polite"><div class="loading">Loading administration data...</div></div>
+        <div class="notification-more"><button type="button" class="btn btn-secondary" id="admin-load-more" hidden>Load more</button></div>
+      </section>
+      <p class="admin-footnote">Account suspension blocks new logins and protected requests. Post removal also removes its comments, likes, and linked notifications.</p>
+    </main>
+
+    <aside class="sidebar-right"><section class="side-panel"><h2>Admin safeguards</h2><p class="side-note" style="margin:0">Administrator status is assigned directly in MongoDB. This console does not grant or revoke admin roles.</p></section></aside>
+  </div>
+  <script type="module" src="/static/js/admin.js"></script>
+  <script type="module" src="/static/js/notification-badge.js"></script>
+</body>
+</html>

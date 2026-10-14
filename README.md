@@ -10,6 +10,7 @@ A social media MVP built with a vanilla HTML/CSS/JavaScript frontend, a Node.js 
 - Comments, likes, follows, and follower/following lists.
 - A paginated notifications inbox for likes, comments, and new followers, with unread counts and read controls.
 - Visible feeds and open comment threads refresh automatically; notification counts and inbox updates poll in the background without a page reload.
+- A protected admin console for account status management and post/comment moderation.
 - Responsive frontend with SVG icons and accessible interaction states.
 
 ## Technology
@@ -71,6 +72,19 @@ npm test
 ```
 
 The suite uses the configured MongoDB connection, creates a temporary user, and removes it after the run. Do not point it at a production database.
+
+## Administrator Access
+
+Administrator privileges are not available through registration or profile editing. To bootstrap the first admin, use a trusted MongoDB client (MongoDB Compass or `mongosh`) to edit an existing user's document in the `users` collection of `social_media_platform` and set:
+
+```json
+{
+  "role": "admin",
+  "isActive": true
+}
+```
+
+Keep database credentials private and only grant this role to trusted maintainers. The user should sign out and back in after role provisioning so the frontend session reflects the new role. The admin console is available at `/admin`; all `/api/admin/*` endpoints independently enforce the role server-side.
 
 ## Deployment
 

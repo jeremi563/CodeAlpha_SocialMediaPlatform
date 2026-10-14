@@ -41,7 +41,18 @@ const userSchema = new mongoose.Schema({
     profilePictureId: {
         type: mongoose.Schema.Types.ObjectId,
         default: null,
-    }
+    },
+    role: {
+        type: String,
+        enum: ["user", "admin"],
+        default: "user",
+        required: true,
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+        required: true,
+    },
 },baseSchemaOptions);
 
 userSchema.set('toJSON',{

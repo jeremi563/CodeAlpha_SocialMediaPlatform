@@ -8,6 +8,7 @@ import postRoutes from './routes/post.routes.js';
 import commentRoutes from './routes/comment.routes.js';
 import followRoutes from './routes/follow.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,11 +44,13 @@ app.get("/register", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "registe
 app.get("/profile", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "profile.html")));
 app.get("/explore", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "explore.html")));
 app.get("/notifications", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "notifications.html")));
+app.get("/admin", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "admin.html")));
 
     app.use('/api/auth', authRoutes);
     app.use('/api/users', userRoutes);
     app.use('/api/users', followRoutes);
     app.use('/api/notifications', notificationRoutes);
+    app.use('/api/admin', adminRoutes);
     app.use('/api/posts', postRoutes);
     app.use('/api/posts', commentRoutes);
     app.use('/api/comments', commentRoutes);
